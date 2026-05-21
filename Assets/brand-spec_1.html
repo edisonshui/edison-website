@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edison — Brand Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB;
+    --paper: #EAE6DC;
+    --parchment: #D6D1C4;
+    --stone: #B8AC9A;
+    --warm-gray: #8A8070;
+    --warm-black: #1C1A14;
+    --sage: #7A8B6F;
+    --sage-light: #C8D4B8;
+    --sage-dark: #4A5E3A;
+    --graph-bg: #0F0E0B;
+    --graph-node: #2E3D28;
+    --graph-edge: #7A8B6F;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--warm-black);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* Document nav */
+  .doc-nav {
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    border-bottom: 0.5px solid var(--parchment);
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    z-index: 100;
+  }
+  .doc-nav-brand { font-family: var(--font-display); font-size: 18px; font-weight: 400; letter-spacing: 0.04em; color: var(--warm-black); }
+  .doc-nav-label { font-size: 11px; color: var(--stone); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Layout */
+  .page { max-width: 900px; margin: 0 auto; padding: 0 48px 120px; }
+
+  /* Sections */
+  .spec-section {
+    padding: 72px 0 64px;
+    border-bottom: 0.5px solid var(--parchment);
+  }
+  .spec-section:last-child { border-bottom: none; }
+
+  /* Section labels */
+  .eyebrow {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 16px;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--parchment);
+    margin-right: 12px;
+  }
+
+  /* Headings */
+  h1 {
+    font-family: var(--font-display);
+    font-size: 80px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--warm-black);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--warm-black);
+    margin-bottom: 12px;
+  }
+  h3 {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--warm-black);
+    margin-bottom: 6px;
+  }
+  p { color: var(--warm-gray); font-size: 14px; line-height: 1.75; }
+
+  /* Hero section */
+  .hero {
+    padding: 96px 0 80px;
+    border-bottom: 0.5px solid var(--parchment);
+  }
+  .hero-label { font-size: 11px; color: var(--stone); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 32px; }
+  .hero-sub { font-family: var(--font-display); font-size: 22px; font-weight: 300; font-style: italic; color: var(--warm-gray); margin-top: 20px; max-width: 500px; line-height: 1.5; }
+
+  /* Color swatches */
+  .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+  .color-swatch {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 0.5px solid var(--parchment);
+  }
+  .swatch-preview { height: 72px; }
+  .swatch-info { padding: 10px 12px; background: var(--paper); }
+  .swatch-name { font-size: 12px; font-weight: 500; color: var(--warm-black); }
+  .swatch-hex { font-family: var(--font-mono); font-size: 10px; color: var(--stone); margin-top: 2px; }
+  .swatch-use { font-size: 11px; color: var(--warm-gray); margin-top: 4px; line-height: 1.4; }
+
+  /* Typography specimens */
+  .type-specimen {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-top: 12px;
+    border: 0.5px solid var(--parchment);
+  }
+  .type-meta { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 14px; margin-top: 14px; border-top: 0.5px solid var(--parchment); }
+  .type-meta-name { font-size: 12px; font-weight: 500; color: var(--warm-black); }
+  .type-meta-detail { font-family: var(--font-mono); font-size: 10px; color: var(--stone); text-align: right; line-height: 1.6; }
+
+  /* Scale table */
+  .scale-row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 0.5px solid var(--parchment); }
+  .scale-row:last-child { border-bottom: none; }
+  .scale-label { font-family: var(--font-mono); font-size: 10px; color: var(--stone); min-width: 80px; }
+  .scale-example { color: var(--warm-black); }
+  .scale-detail { font-family: var(--font-mono); font-size: 10px; color: var(--parchment); margin-left: auto; }
+
+  /* Spacing tokens */
+  .spacing-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; align-items: flex-end; }
+  .spacing-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .spacing-bar { background: var(--sage-light); border-radius: 2px; width: 16px; }
+  .spacing-val { font-family: var(--font-mono); font-size: 9px; color: var(--stone); }
+
+  /* Rule rows */
+  .rule-row { display: flex; gap: 16px; padding: 14px 0; border-bottom: 0.5px solid var(--parchment); align-items: flex-start; }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sage); margin-top: 7px; flex-shrink: 0; }
+  .rule-text { font-size: 14px; color: var(--warm-gray); line-height: 1.65; }
+  .rule-strong { color: var(--warm-black); font-weight: 500; }
+
+  /* Component previews */
+  .component-preview {
+    background: var(--cream);
+    border: 0.5px solid var(--parchment);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 12px 0;
+  }
+  .component-label { font-size: 10px; color: var(--stone); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+
+  /* Simulated nav */
+  .sim-nav { display: flex; justify-content: space-between; align-items: center; }
+  .sim-nav-brand { font-family: var(--font-display); font-size: 17px; font-weight: 400; letter-spacing: 0.04em; }
+  .sim-nav-links { display: flex; gap: 28px; }
+  .sim-nav-link { font-size: 12px; color: var(--warm-gray); text-decoration: none; letter-spacing: 0.01em; }
+  .sim-nav-link.active { color: var(--warm-black); border-bottom: 0.5px solid var(--warm-black); padding-bottom: 1px; }
+
+  /* Simulated buttons */
+  .sim-btn-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .sim-btn {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 9px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: none;
+  }
+  .sim-btn-primary { background: var(--warm-black); color: var(--cream); }
+  .sim-btn-ghost { background: transparent; color: var(--warm-black); border: 0.5px solid var(--parchment); }
+  .sim-btn-text { background: transparent; color: var(--sage); padding: 0; border: none; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Blog card preview */
+  .post-card { padding: 20px 0; border-bottom: 0.5px solid var(--parchment); }
+  .post-card:last-child { border-bottom: none; }
+  .post-date { font-size: 11px; color: var(--stone); margin-bottom: 6px; letter-spacing: 0.04em; }
+  .post-title { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--warm-black); line-height: 1.25; margin-bottom: 6px; }
+  .post-excerpt { font-size: 13px; color: var(--warm-gray); line-height: 1.65; }
+  .post-tags { display: flex; gap: 8px; margin-top: 10px; }
+  .post-tag { font-size: 10px; color: var(--warm-gray); letter-spacing: 0.06em; text-transform: lowercase; background: var(--paper); padding: 3px 9px; border-radius: 2px; }
+
+  /* Project card */
+  .project-card {
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 22px 24px;
+    border: 0.5px solid var(--parchment);
+    margin-bottom: 10px;
+  }
+  .project-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; color: var(--warm-black); margin-bottom: 6px; }
+  .project-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.6; margin-bottom: 12px; }
+  .project-stack { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stack-tag { font-family: var(--font-mono); font-size: 10px; color: var(--sage-dark); background: var(--sage-light); padding: 3px 8px; border-radius: 2px; }
+
+  /* Page architecture */
+  .page-diagram { margin-top: 20px; }
+  .page-item {
+    display: flex;
+    gap: 0;
+    margin-bottom: 4px;
+    align-items: stretch;
+  }
+  .page-route {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--sage);
+    padding: 12px 16px;
+    background: var(--paper);
+    border: 0.5px solid var(--parchment);
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+  }
+  .page-content-desc {
+    font-size: 12px;
+    color: var(--warm-gray);
+    padding: 12px 16px;
+    background: var(--cream);
+    border: 0.5px solid var(--parchment);
+    border-radius: 0 6px 6px 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
+  }
+  .page-content-desc b { color: var(--warm-black); font-weight: 500; }
+  .page-route.special { background: var(--graph-bg); color: var(--graph-edge); border-color: #2A2A20; }
+  .page-content-desc.special { background: #1A1910; color: #8A9A7F; border-color: #2A2A20; }
+
+  /* Graph spec */
+  .graph-canvas {
+    background: var(--graph-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 0.5px solid #2A2A20;
+    margin: 16px 0;
+  }
+
+  /* Divider */
+  .divider { border: none; border-top: 0.5px solid var(--parchment); margin: 40px 0; }
+
+  /* Voice examples */
+  .voice-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--parchment); border-radius: 10px; overflow: hidden; margin-top: 12px; }
+  .voice-col { padding: 18px 20px; background: var(--cream); }
+  .voice-col.bad { background: var(--paper); }
+  .voice-col-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .voice-col.bad .voice-col-label { color: var(--stone); }
+  .voice-col.good .voice-col-label { color: var(--sage-dark); }
+  .voice-example { font-size: 13px; line-height: 1.65; }
+  .voice-col.bad .voice-example { color: var(--stone); }
+  .voice-col.good .voice-example { color: var(--warm-black); }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+
+  /* Stack grid */
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; }
+  .stack-card {
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border: 0.5px solid var(--parchment);
+  }
+  .stack-card-name { font-size: 13px; font-weight: 500; color: var(--warm-black); margin-bottom: 3px; }
+  .stack-card-why { font-size: 11px; color: var(--warm-gray); line-height: 1.5; }
+
+  /* Motion spec */
+  .motion-row { padding: 14px 0; border-bottom: 0.5px solid var(--parchment); display: flex; gap: 20px; }
+  .motion-row:last-child { border-bottom: none; }
+  .motion-element { font-size: 12px; font-weight: 500; color: var(--warm-black); min-width: 160px; }
+  .motion-spec { font-family: var(--font-mono); font-size: 11px; color: var(--sage); min-width: 160px; }
+  .motion-note { font-size: 12px; color: var(--warm-gray); line-height: 1.5; }
+
+  /* File tree */
+  .tree { font-family: var(--font-mono); font-size: 12px; line-height: 2; color: var(--warm-gray); background: var(--paper); padding: 24px 28px; border-radius: 10px; margin-top: 16px; border: 0.5px solid var(--parchment); }
+  .tree-dir { color: var(--warm-black); font-weight: 400; }
+  .tree-file { color: var(--warm-gray); }
+  .tree-comment { color: var(--parchment); }
+
+  /* Separator number */
+  .big-num { font-family: var(--font-display); font-size: 13px; font-weight: 300; color: var(--parchment); margin-right: 10px; }
+
+  .info-row { background: var(--paper); border-radius: 8px; padding: 14px 18px; margin-top: 10px; border-left: 2px solid var(--sage); border-radius: 0 8px 8px 0; }
+  .info-row p { font-size: 13px; color: var(--warm-gray); line-height: 1.65; }
+  .info-row p b { color: var(--warm-black); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<nav class="doc-nav">
+  <span class="doc-nav-brand">EDISON</span>
+  <span class="doc-nav-label">Brand Specification — v1.2</span>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-label">Personal brand & website specification</p>
+    <h1>Brand<br>Spec</h1>
+    <p class="hero-sub">A warm, intentional personal site. One unexpected room. Built to last.</p>
+  </div>
+
+  <!-- 01 BRAND IDENTITY -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">01</span>Brand identity</p>
+    <h2>Identity</h2>
+
+    <div class="two-col" style="margin-top:24px;">
+      <div>
+        <h3>Wordmark</h3>
+        <p>Your name is your brand. No logomark, no icon — the name does all the work. Set in Cormorant Garamond, tracked slightly wide, all caps at small sizes.</p>
+        <div style="margin-top:16px; background:var(--paper); border-radius:10px; padding:28px; text-align:center; border:0.5px solid var(--parchment);">
+          <div style="font-family:var(--font-display); font-size:42px; font-weight:300; letter-spacing:0.04em; color:var(--warm-black);">EDISON</div>
+          <div style="font-size:10px; color:var(--stone); margin-top:8px; letter-spacing:0.1em; text-transform:uppercase;">Primary wordmark — light weight, tracked</div>
+        </div>
+        <div style="margin-top:10px; background:var(--graph-bg); border-radius:10px; padding:28px; text-align:center;">
+          <div style="font-family:var(--font-display); font-size:42px; font-weight:300; letter-spacing:0.04em; color:#EAE6DC;">EDISON</div>
+          <div style="font-size:10px; color:#5A5A4A; margin-top:8px; letter-spacing:0.1em; text-transform:uppercase;">On dark — cream variant</div>
+        </div>
+      </div>
+      <div>
+        <h3>Tagline</h3>
+        <p>Used in the hero, meta descriptions, and social bios. Set in Cormorant italic — warm and human, not résumé-speak.</p>
+        <div style="margin-top:16px; background:var(--paper); border-radius:10px; padding:24px; border:0.5px solid var(--parchment);">
+          <div style="font-family:var(--font-display); font-size:22px; font-style:italic; font-weight:300; color:var(--warm-black); line-height:1.35;">"Building things.<br>Writing thoughts."</div>
+          <div style="font-size:10px; color:var(--stone); margin-top:12px; letter-spacing:0.08em; text-transform:uppercase;">Primary tagline</div>
+        </div>
+        <div style="margin-top:10px; background:var(--paper); border-radius:10px; padding:24px; border:0.5px solid var(--parchment);">
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.7;">CS student. I write about what I'm building, what I'm learning, and occasionally about chess.</div>
+          <div style="font-size:10px; color:var(--stone); margin-top:10px; letter-spacing:0.08em; text-transform:uppercase;">Bio / about line — for social & about page</div>
+        </div>
+
+        <h3 style="margin-top:24px;">Positioning</h3>
+        <p>Not "a developer portfolio." A personal site from someone with a real point of view. The writing is as important as the code. The graph page is an art installation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 COLOR -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">02</span>Color system</p>
+    <h2>Colors</h2>
+    <p>Pulled from cream paper, dried sage, warm stone. The palette has exactly one accent — sage green — used sparingly. No blue. Nothing cold. The graph page is the single intentional break: a warm dark canvas.</p>
+
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#F5F2EB;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Cream</div>
+          <div class="swatch-hex">#F5F2EB</div>
+          <div class="swatch-use">Primary background. All pages except Graph.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#EAE6DC;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Paper</div>
+          <div class="swatch-hex">#EAE6DC</div>
+          <div class="swatch-use">Secondary surfaces — cards, code blocks, hover states.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#D6D1C4;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Parchment</div>
+          <div class="swatch-hex">#D6D1C4</div>
+          <div class="swatch-use">Borders, dividers, inactive UI elements.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#B8AC9A;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Stone</div>
+          <div class="swatch-hex">#B8AC9A</div>
+          <div class="swatch-use">Labels, captions, dates, secondary text.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#8A8070;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Warm Gray</div>
+          <div class="swatch-hex">#8A8070</div>
+          <div class="swatch-use">Body copy, descriptions, supporting text.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#1C1A14;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Warm Black</div>
+          <div class="swatch-hex">#1C1A14</div>
+          <div class="swatch-use">Headlines, titles, nav wordmark, primary text.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#7A8B6F;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Sage — Accent</div>
+          <div class="swatch-hex">#7A8B6F</div>
+          <div class="swatch-use">The only accent. Links, hover states, active indicators, graph edges.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#C8D4B8;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Sage Light</div>
+          <div class="swatch-hex">#C8D4B8</div>
+          <div class="swatch-use">Sage tint — code tag backgrounds, subtle sage fills.</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#0F0E0B;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Graph Black</div>
+          <div class="swatch-hex">#0F0E0B</div>
+          <div class="swatch-use">Graph page only. A warm near-black — not #000000.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row" style="margin-top:20px;">
+      <p><b>The rule:</b> Use sage for exactly one thing per view — either a link, or an active state, or a tag background. Never two sage elements competing on the same screen. The restraint is what makes it land.</p>
+    </div>
+  </div>
+
+  <!-- 03 TYPOGRAPHY -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">03</span>Typography</p>
+    <h2>Type</h2>
+    <p>Three fonts. Each has one role. They never compete. Cormorant for big emotional moments. DM Sans for clean infrastructure. Lora for reading.</p>
+
+    <div class="type-specimen" style="margin-top:28px;">
+      <div style="font-family:var(--font-display); font-size:56px; font-weight:300; line-height:1; color:var(--warm-black); letter-spacing:-0.01em;">Cormorant<br><em>Garamond</em></div>
+      <div class="type-meta">
+        <div>
+          <div class="type-meta-name">Display — hero, section titles, post titles, wordmark</div>
+        </div>
+        <div class="type-meta-detail">
+          Google Fonts: Cormorant Garamond<br>
+          Weights: 300 (light), 400 (regular)<br>
+          Use italic for: taglines, pull quotes, emphasis
+        </div>
+      </div>
+    </div>
+
+    <div class="type-specimen">
+      <div style="font-family:var(--font-ui); font-size:32px; font-weight:300; line-height:1; color:var(--warm-black); letter-spacing:-0.005em;">DM Sans</div>
+      <div style="font-family:var(--font-ui); font-size:14px; font-weight:400; color:var(--warm-gray); margin-top:10px; line-height:1.7;">Navigation · UI labels · Captions · Body on non-blog pages · Buttons · Tag text · This sentence is an example of DM Sans body weight at 14px.</div>
+      <div class="type-meta">
+        <div class="type-meta-name">UI — navigation, labels, captions, non-blog body</div>
+        <div class="type-meta-detail">
+          Google Fonts: DM Sans<br>
+          Weights: 300 (captions), 400 (body), 500 (labels)
+        </div>
+      </div>
+    </div>
+
+    <div class="type-specimen">
+      <div style="font-family:var(--font-body); font-size:20px; font-weight:400; line-height:1.8; color:var(--warm-black); max-width:520px;">
+        Lora makes blog posts feel worth reading. It's warm and humanist, with enough personality to reward long reads without calling attention to itself.
+      </div>
+      <div class="type-meta">
+        <div class="type-meta-name">Body — blog post prose only</div>
+        <div class="type-meta-detail">
+          Google Fonts: Lora<br>
+          Weights: 400 regular, 400 italic<br>
+          18–19px, line-height 1.85
+        </div>
+      </div>
+    </div>
+
+    <div class="type-specimen">
+      <div style="font-family:var(--font-mono); font-size:14px; color:var(--sage); line-height:1.7;">
+        const graph = new ForceSimulation()<br>
+        &nbsp;&nbsp;.nodes(photos)<br>
+        &nbsp;&nbsp;.edges(sharedTags)
+      </div>
+      <div class="type-meta">
+        <div class="type-meta-name">Mono — code blocks, hex values, routes, dates</div>
+        <div class="type-meta-detail">
+          Google Fonts: JetBrains Mono<br>
+          Weight: 400 only<br>
+          13–14px, sage color on light bg
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px; margin-bottom:16px;">Type scale</h3>
+    <div style="background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment);">
+      <div class="scale-row">
+        <span class="scale-label">hero</span>
+        <span class="scale-example" style="font-family:var(--font-display); font-size:64px; font-weight:300; line-height:1; letter-spacing:-0.02em;">Edison</span>
+        <span class="scale-detail">Cormorant 300 · 64–96px · hero only</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">display</span>
+        <span class="scale-example" style="font-family:var(--font-display); font-size:40px; font-weight:400; line-height:1.1;">Section title</span>
+        <span class="scale-detail">Cormorant 400 · 36–48px</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">post-title</span>
+        <span class="scale-example" style="font-family:var(--font-display); font-size:26px; font-weight:400; line-height:1.2;">Blog post title here</span>
+        <span class="scale-detail">Cormorant 400 · 22–28px</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">ui-label</span>
+        <span class="scale-example" style="font-family:var(--font-ui); font-size:13px; font-weight:500; color:var(--warm-black);">Navigation / label</span>
+        <span class="scale-detail">DM Sans 500 · 12–13px</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">body</span>
+        <span class="scale-example" style="font-family:var(--font-ui); font-size:14px; color:var(--warm-gray);">Page body text and descriptions</span>
+        <span class="scale-detail">DM Sans 400 · 14px · lh 1.75</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">prose</span>
+        <span class="scale-example" style="font-family:var(--font-body); font-size:18px; color:var(--warm-black);">Blog post reading text</span>
+        <span class="scale-detail">Lora 400 · 18px · lh 1.85</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">eyebrow</span>
+        <span class="scale-example" style="font-family:var(--font-ui); font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--stone);">Section label</span>
+        <span class="scale-detail">DM Sans 500 · 10px · tracked 0.12em</span>
+      </div>
+      <div class="scale-row">
+        <span class="scale-label">mono</span>
+        <span class="scale-example" style="font-family:var(--font-mono); font-size:12px; color:var(--sage);">/writing/[slug]</span>
+        <span class="scale-detail">JetBrains Mono · 11–13px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 SPACING & LAYOUT -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">04</span>Spacing & layout</p>
+    <h2>Space</h2>
+    <p>Generous whitespace is the primary design element. When in doubt, add more space. The 12 Matcha principle: every empty pixel is intentional.</p>
+
+    <div style="margin-top:28px;">
+      <h3 style="margin-bottom:12px;">Spacing tokens</h3>
+      <div class="spacing-grid">
+        <div class="spacing-item"><div class="spacing-bar" style="height:4px;"></div><span class="spacing-val">4px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:8px;"></div><span class="spacing-val">8px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:12px;"></div><span class="spacing-val">12px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:16px;"></div><span class="spacing-val">16px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:24px;"></div><span class="spacing-val">24px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:32px;"></div><span class="spacing-val">32px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:48px;"></div><span class="spacing-val">48px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:64px;"></div><span class="spacing-val">64px</span></div>
+        <div class="spacing-item"><div class="spacing-bar" style="height:96px;"></div><span class="spacing-val">96px</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;">
+      <h3 style="margin-bottom:12px;">Layout constraints</h3>
+      <div style="background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment);">
+        <div class="rule-row">
+          <div class="rule-dot"></div>
+          <div class="rule-text"><span class="rule-strong">Site max-width:</span> 1100px. Centered. Breathing room on wide displays.</div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-dot"></div>
+          <div class="rule-text"><span class="rule-strong">Blog post max-width:</span> 660px. Narrow by design. Readable at all sizes.</div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-dot"></div>
+          <div class="rule-text"><span class="rule-strong">Side padding:</span> 24px mobile · 48px tablet · 64px desktop.</div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-dot"></div>
+          <div class="rule-text"><span class="rule-strong">Section vertical rhythm:</span> 80–96px between sections on marketing pages · 48–64px on content pages.</div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-dot"></div>
+          <div class="rule-text"><span class="rule-strong">Graph page:</span> 100vw × 100vh. No padding. Full bleed canvas.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 COMPONENTS -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">05</span>Components</p>
+    <h2>Components</h2>
+
+    <!-- Nav -->
+    <h3 style="margin-bottom:8px; margin-top:28px;">Navigation</h3>
+    <p style="margin-bottom:12px;">Sticky. Transparent on load, transitions to cream on scroll. 52px height. No hamburger on desktop. On mobile: name stays, links collapse to a minimal drawer.</p>
+    <div class="component-preview">
+      <p class="component-label">Nav — default state</p>
+      <div class="sim-nav">
+        <span class="sim-nav-brand">EDISON</span>
+        <div class="sim-nav-links">
+          <a class="sim-nav-link">writing</a>
+          <a class="sim-nav-link">projects</a>
+          <a class="sim-nav-link">playground</a>
+          <a class="sim-nav-link">graph</a>
+          <a class="sim-nav-link">about</a>
+        </div>
+      </div>
+    </div>
+    <div class="component-preview" style="background:var(--graph-bg); border-color:#2A2A20;">
+      <p class="component-label" style="color:#5A5A4A;">Nav — on graph page (dark variant)</p>
+      <div class="sim-nav">
+        <span class="sim-nav-brand" style="color:#EAE6DC; font-family:var(--font-display);">EDISON</span>
+        <div class="sim-nav-links">
+          <a class="sim-nav-link" style="color:#5A5A4A;">writing</a>
+          <a class="sim-nav-link" style="color:#5A5A4A;">projects</a>
+          <a class="sim-nav-link" style="color:#5A5A4A;">playground</a>
+          <a class="sim-nav-link" style="color:#7A8B6F; border-bottom:0.5px solid #7A8B6F; padding-bottom:1px;">graph</a>
+          <a class="sim-nav-link" style="color:#5A5A4A;">about</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <h3 style="margin-top:32px; margin-bottom:8px;">Buttons</h3>
+    <p style="margin-bottom:12px;">Three variants. Primary is used once per page maximum — for the single most important action. Ghost for secondary. Text link for inline use.</p>
+    <div class="component-preview">
+      <p class="component-label">Button variants</p>
+      <div class="sim-btn-row">
+        <button class="sim-btn sim-btn-primary">view project</button>
+        <button class="sim-btn sim-btn-ghost">read more</button>
+        <button class="sim-btn sim-btn-text">enter the graph →</button>
+      </div>
+    </div>
+
+    <!-- Blog card -->
+    <h3 style="margin-top:32px; margin-bottom:8px;">Writing list — post cards</h3>
+    <p style="margin-bottom:12px;">No thumbnail images in the list. Date, title, excerpt, tags. The title does the selling. Cormorant makes even a simple title feel worth reading.</p>
+    <div class="component-preview">
+      <p class="component-label">Post list items</p>
+      <div class="post-card">
+        <div class="post-date">May 12, 2025</div>
+        <div class="post-title">Building a chess engine that actually beats me</div>
+        <div class="post-excerpt">I spent three weeks implementing minimax with alpha-beta pruning. Here's what I got wrong first, and what finally made it click.</div>
+        <div class="post-tags">
+          <span class="post-tag">chess</span>
+          <span class="post-tag">algorithms</span>
+          <span class="post-tag">projects</span>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-date">Apr 3, 2025</div>
+        <div class="post-title">What I learned building websites for restaurants in my neighborhood</div>
+        <div class="post-excerpt">A senior project that started as a CS requirement and turned into something I actually care about.</div>
+        <div class="post-tags">
+          <span class="post-tag">web</span>
+          <span class="post-tag">community</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project card -->
+    <h3 style="margin-top:32px; margin-bottom:8px;">Project cards</h3>
+    <p style="margin-bottom:12px;">Used on the projects page. Title in Cormorant. One-line description. Stack tags in mono sage. A subtle external link.</p>
+    <div class="component-preview">
+      <p class="component-label">Project card</p>
+      <div class="project-card">
+        <div class="project-title">Chess Engine</div>
+        <div class="project-desc">A browser-based chess game with a minimax AI opponent, alpha-beta pruning, quiescence search, and an opening book. Playable at multiple difficulty levels.</div>
+        <div class="project-stack">
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">Web Workers</span>
+          <span class="stack-tag">HTML/CSS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <h3 style="margin-top:32px; margin-bottom:8px;">Tags & labels</h3>
+    <div class="component-preview">
+      <p class="component-label">Category tags — always lowercase</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="post-tag">chess</span>
+        <span class="post-tag">algorithms</span>
+        <span class="post-tag">cs</span>
+        <span class="post-tag">projects</span>
+        <span class="post-tag">career</span>
+        <span class="post-tag">tutorials</span>
+        <span class="post-tag">thoughts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 PAGES -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">06</span>Page architecture</p>
+    <h2>Pages</h2>
+
+    <div class="page-diagram">
+      <div class="page-item">
+        <div class="page-route">/</div>
+        <div class="page-content-desc"><b>Home</b> — Hero (ink video + name + tagline). Recent writing (3 posts). Featured projects (2). Moments montage. Graph teaser.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route">/writing</div>
+        <div class="page-content-desc"><b>Writing index</b> — Full post list, sorted by date. Filter by tag (cs, chess, career, tutorials, thoughts). No pagination until 20+ posts.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route">/writing/[slug]</div>
+        <div class="page-content-desc"><b>Post</b> — Big Cormorant title. Date + read time. Drop cap on first paragraph. Lora body. Related posts footer.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route">/projects</div>
+        <div class="page-content-desc"><b>Projects</b> — Formal portfolio. Card grid: title, description, stack tags, link. Recruiter-readable. No interactive demos — those live at /playground.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route" style="background:#F0EDE4; color:#5A4A30; border-color:#D6D1C4;">/playground</div>
+        <div class="page-content-desc" style="background:#FAF8F3; border-color:#D6D1C4;"><b>Playground</b> — Interactive demos, live embeds, and a sandbox editor. Things you can actually use. Full spec in section 07.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route special">/graph</div>
+        <div class="page-content-desc special"><b>Photo graph</b> — Full-screen dark canvas. D3 force simulation. Photo nodes. Sage edges. The signature experience. Full spec in section 09.</div>
+      </div>
+      <div class="page-item" style="margin-top:4px;">
+        <div class="page-route">/about</div>
+        <div class="page-content-desc"><b>About</b> — Photo of you. Short bio (3–4 sentences). Currently section. Links: GitHub, resume, email.</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h3 style="margin-bottom:16px;">Home page structure</h3>
+    <div style="background:var(--paper); border-radius:10px; border:0.5px solid var(--parchment); overflow:hidden;">
+      <div style="padding:20px 24px; border-bottom:0.5px solid var(--parchment); display:flex; gap:16px; align-items:flex-start;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:80px; padding-top:2px;">01 · Hero</div>
+        <div>
+          <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">Full viewport. Ink-diffusion video loops silently in the background. Name + tagline anchored bottom-left over the clear cream water. Scroll indicator.</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Video covers 100vw × 100vh, object-fit: cover, muted, autoplay, loop, playsinline. No overlay layer — the cream water provides contrast naturally. Text: "EDISON" in Cormorant 300 at 80px, tagline in Cormorant italic 20px below. No CTA button. Full video and text spec in section 08.</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px; border-bottom:0.5px solid var(--parchment); display:flex; gap:16px; align-items:flex-start;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:80px; padding-top:2px;">02 · Writing</div>
+        <div>
+          <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">3 most recent posts. Section eyebrow: "writing". Link to /writing.</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Post cards as described in components. Date · Title · Tags. No excerpt on the homepage version — trust the titles.</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px; border-bottom:0.5px solid var(--parchment); display:flex; gap:16px; align-items:flex-start;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:80px; padding-top:2px;">03 · Projects</div>
+        <div>
+          <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">2–3 featured projects. Section eyebrow: "projects". Link to /projects.</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Project cards — title, one-line desc, stack tags. Restrained. Let the projects list page do the detail work.</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px; border-bottom:0.5px solid var(--parchment); display:flex; gap:16px; align-items:flex-start;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:80px; padding-top:2px;">04 · Moments</div>
+        <div>
+          <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">Full-bleed video montage. The emotional beat of the page — where you go from impressive to interesting.</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Positioned after Projects because it needs to be earned. The logic: here's my writing → here's what I build → now here's who I am. Eyebrow: "moments". A short, unhurried supercut of real life — 45–90 seconds. No text overlay on the video itself. A single line of caption text below: one sentence in Cormorant italic. Full montage spec in section 08.</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start; background:var(--graph-bg);">
+        <div style="font-family:var(--font-mono); font-size:10px; color:#4A5A3A; min-width:80px; padding-top:2px;">05 · Graph</div>
+        <div>
+          <div style="font-size:13px; font-weight:500; color:#C8D0B8; margin-bottom:4px;">A teaser section. Dark background starts here — the preview of the graph experience.</div>
+          <div style="font-size:12px; color:#5A6A50; line-height:1.6;">A small live graph preview (smaller, non-interactive version). One-line description. CTA: "enter the graph →"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 PLAYGROUND -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">07</span>Playground</p>
+    <h2>Things you can<br>actually use.</h2>
+    <p>The playground is not a second projects page. The distinction is the difference between reading about something and doing it. /projects is formal — descriptions, stack, links, recruiter-readable. /playground is experiential — the work is embedded and alive, and you interact with it directly on the page.</p>
+
+    <div class="info-row" style="margin-top:20px; margin-bottom:28px;">
+      <p><b>The rule:</b> If you can't interact with it on the page, it doesn't belong here — it belongs on /projects. A chess engine card with a "view on GitHub" link is a project. A chess engine you can play against is playground.</p>
+    </div>
+
+    <h3 style="margin-bottom:12px;">Projects vs. playground</h3>
+    <div style="background:var(--paper); border-radius:10px; border:0.5px solid var(--parchment); overflow:hidden; margin-bottom:28px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+        <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); border-right:0.5px solid var(--parchment);">
+          <div style="font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--stone); margin-bottom:8px;">/projects</div>
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Chess Engine — description, stack tags, GitHub link, live site link</div>
+        </div>
+        <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment);">
+          <div style="font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-dark); margin-bottom:8px;">/playground</div>
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Chess Engine — embedded board, playable right here, difficulty toggle</div>
+        </div>
+        <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); border-right:0.5px solid var(--parchment);">
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Restaurant sites — description, tech stack, link out</div>
+        </div>
+        <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment);">
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Restaurant sites — iframe previews you can scroll and click inside</div>
+        </div>
+        <div style="padding:16px 20px; border-right:0.5px solid var(--parchment);">
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Claude tools — description and GitHub link</div>
+        </div>
+        <div style="padding:16px 20px;">
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.65;">Sandbox — live code editor with real-time preview, for experiments</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:12px;">Demo card anatomy</h3>
+    <p style="margin-bottom:16px;">Each entry in the playground is a demo card. At rest it's compact. It expands in-place when you open it, revealing the live demo without a page transition.</p>
+    <div style="background:var(--paper); border-radius:12px; border:0.5px solid var(--parchment); overflow:hidden; margin-bottom:8px;">
+      <div style="padding:18px 20px; border-bottom:0.5px solid var(--parchment); display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+            <span style="font-family:var(--font-display); font-size:20px; font-weight:400; color:var(--warm-black);">Chess Engine</span>
+            <span style="font-size:10px; font-weight:500; background:var(--sage-light); color:var(--sage-dark); padding:2px 9px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase;">live</span>
+          </div>
+          <div style="font-size:13px; color:var(--warm-gray); line-height:1.6; margin-bottom:10px;">Minimax AI with alpha-beta pruning. Three difficulty levels. Can you beat it on hard?</div>
+          <div style="display:flex; gap:6px;">
+            <span class="stack-tag">JavaScript</span>
+            <span class="stack-tag">Web Workers</span>
+            <span class="stack-tag">HTML/CSS</span>
+          </div>
+        </div>
+        <button class="sim-btn sim-btn-ghost" style="white-space:nowrap; flex-shrink:0;">open ↓</button>
+      </div>
+      <div style="padding:16px 20px; background:var(--cream); border-top:0.5px solid var(--parchment);">
+        <div style="background:var(--parchment); border-radius:8px; height:180px; display:flex; align-items:center; justify-content:center;">
+          <span style="font-size:12px; color:var(--stone); font-family:var(--font-mono);">← live chess board renders here when opened →</span>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px; color:var(--warm-gray); margin-bottom:28px; line-height:1.6;">Status badges: <span style="background:var(--sage-light); color:var(--sage-dark); font-size:10px; font-weight:500; padding:2px 7px; border-radius:2px;">live</span> for complete projects · <span style="background:var(--paper); color:var(--warm-gray); font-size:10px; font-weight:500; padding:2px 7px; border-radius:2px; border:0.5px solid var(--parchment);">experiment</span> for interesting but rough · <span style="background:var(--parchment); color:var(--stone); font-size:10px; font-weight:500; padding:2px 7px; border-radius:2px;">wip</span> for in-progress</p>
+
+    <h3 style="margin-bottom:12px;">Page structure</h3>
+    <div style="background:var(--paper); border-radius:10px; border:0.5px solid var(--parchment); overflow:hidden; margin-bottom:28px;">
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Header</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Eyebrow: "playground". Title in Cormorant: "Things you can use." One-line description: "Live demos, interactive experiments, and a sandbox."</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Filter bar</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Horizontal pill filters: all · live · experiment · wip. DM Sans 500, 12px. Active pill: sage background. On mobile this collapses to a dropdown.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Demo grid</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Single-column list of demo cards, sorted newest first. Not a grid — demos expand vertically so columns would create layout chaos. Each card: status badge, Cormorant title, description, stack tags, open/close toggle.</div>
+      </div>
+      <div style="padding:16px 20px; display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Sandbox</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Pinned at the bottom. Always visible. A small in-browser code environment: three tabs (HTML · CSS · JS) and a split live preview pane. Pre-loaded with your current experiment or a starter snippet. Built with CodeMirror. Styled to the cream/sage palette.</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:12px;">The sandbox</h3>
+    <p style="margin-bottom:16px;">The sandbox is the playground's most distinctive feature. A live code editor, right on your personal site, where you can paste and run any HTML/CSS/JS snippet. Pre-loaded with whatever you're currently tinkering on — rotate it as you explore new ideas.</p>
+    <div style="background:var(--warm-black); border-radius:12px; overflow:hidden; border:0.5px solid #2A2820;">
+      <div style="background:#252018; padding:10px 16px; display:flex; gap:0; border-bottom:0.5px solid #2A2820;">
+        <div style="font-size:11px; font-weight:500; color:#EAE6DC; padding:4px 14px; border-bottom:1px solid var(--sage); margin-right:2px;">HTML</div>
+        <div style="font-size:11px; color:#5A5A4A; padding:4px 14px; margin-right:2px;">CSS</div>
+        <div style="font-size:11px; color:#5A5A4A; padding:4px 14px;">JS</div>
+        <div style="margin-left:auto; font-size:10px; color:#3A3A2A; font-family:var(--font-mono); align-self:center;">sandbox · current experiment</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+        <div style="padding:16px 18px; border-right:0.5px solid #2A2820;">
+          <div style="font-family:var(--font-mono); font-size:11px; color:#7A8B6F; line-height:2;">
+            <span style="color:#5A7A5A;">&lt;div</span> <span style="color:#8A9A7A;">class=</span><span style="color:#A8C090;">"card"</span><span style="color:#5A7A5A;">&gt;</span><br>
+            &nbsp;&nbsp;<span style="color:#5A7A5A;">&lt;h2&gt;</span><span style="color:#C8D0A8;">Hello</span><span style="color:#5A7A5A;">&lt;/h2&gt;</span><br>
+            &nbsp;&nbsp;<span style="color:#5A7A5A;">&lt;p&gt;</span><span style="color:#C8D0A8;">Experiment…</span><span style="color:#5A7A5A;">&lt;/p&gt;</span><br>
+            <span style="color:#5A7A5A;">&lt;/div&gt;</span>
+          </div>
+        </div>
+        <div style="padding:16px 18px; display:flex; align-items:center; justify-content:center;">
+          <div style="background:#F5F2EB; border-radius:6px; padding:16px 20px; width:100%;">
+            <div style="font-family:Georgia, serif; font-size:16px; font-weight:300; color:#1C1A14; margin-bottom:4px;">Hello</div>
+            <div style="font-size:12px; color:#8A8070;">Experiment…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:11px; color:var(--stone); margin-top:8px; text-align:center;">CodeMirror editor left · live preview right · updates as you type</p>
+
+    <hr class="divider">
+
+    <h3 style="margin-bottom:8px;">Inventory of demos</h3>
+    <p style="margin-bottom:16px;">Starting point. Add to this as you build more. Items marked with ✦ appear in both /projects (formal) and /playground (interactive).</p>
+    <div style="background:var(--paper); border-radius:10px; border:0.5px solid var(--parchment); overflow:hidden;">
+      <div style="padding:14px 20px; border-bottom:0.5px solid var(--parchment); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-family:var(--font-display); font-size:16px; color:var(--warm-black);">✦ Chess Engine</span>
+          <span style="font-size:12px; color:var(--warm-gray); margin-left:10px;">Full chess game, playable inline</span>
+        </div>
+        <span style="background:var(--sage-light); color:var(--sage-dark); font-size:10px; font-weight:500; padding:2px 9px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase;">live</span>
+      </div>
+      <div style="padding:14px 20px; border-bottom:0.5px solid var(--parchment); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-family:var(--font-display); font-size:16px; color:var(--warm-black);">✦ Restaurant Sites</span>
+          <span style="font-size:12px; color:var(--warm-gray); margin-left:10px;">Scrollable iframe previews, click through to live</span>
+        </div>
+        <span style="background:var(--sage-light); color:var(--sage-dark); font-size:10px; font-weight:500; padding:2px 9px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase;">live</span>
+      </div>
+      <div style="padding:14px 20px; border-bottom:0.5px solid var(--parchment); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-family:var(--font-display); font-size:16px; color:var(--warm-black);">Claude Vision Tool</span>
+          <span style="font-size:12px; color:var(--warm-gray); margin-left:10px;">Demo interface — upload image, get suggestions</span>
+        </div>
+        <span style="background:var(--paper); color:var(--warm-gray); font-size:10px; font-weight:500; padding:2px 9px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase; border:0.5px solid var(--parchment);">experiment</span>
+      </div>
+      <div style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-family:var(--font-display); font-size:16px; color:var(--warm-black);">Sandbox</span>
+          <span style="font-size:12px; color:var(--warm-gray); margin-left:10px;">Live CodeMirror editor, always at the bottom</span>
+        </div>
+        <span style="background:var(--parchment); color:var(--stone); font-size:10px; font-weight:500; padding:2px 9px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase;">always on</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 VIDEO -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">08</span>Video</p>
+    <h2>Two videos.<br>Two purposes.</h2>
+    <p>The site uses video in exactly two places. Each serves a completely different function. They should never be confused with each other.</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:24px; margin-bottom:32px;">
+      <div style="background:var(--paper); border-radius:10px; padding:18px 20px; border:0.5px solid var(--parchment);">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em;">Video 01 · Hero</div>
+        <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:6px;">Atmospheric wallpaper</div>
+        <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Sets tone. Gets out of the way. Loops invisibly. Nobody reads it — they feel it. Ink diffusion in cream water.</div>
+      </div>
+      <div style="background:var(--paper); border-radius:10px; padding:18px 20px; border:0.5px solid var(--parchment);">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em;">Video 02 · Montage</div>
+        <div style="font-size:13px; font-weight:500; color:var(--warm-black); margin-bottom:6px;">Earned personality moment</div>
+        <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Content, not wallpaper. Placed after Projects — after the visitor has a reason to care about you as a person.</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h3 style="margin-bottom:6px;">Video 01 — Hero background</h3>
+    <p style="margin-bottom:16px;">Ink already diffused into warm cream water, shot from directly overhead. The ink is mid-settle — barely moving, the physics of diffusion continuing at an almost imperceptible rate. Loops seamlessly because the start and end frame are virtually identical.</p>
+
+    <div style="background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment); margin-bottom:12px;">
+      <div style="font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--stone); margin-bottom:10px;">Image prompt — generate this first (Midjourney, Firefly, Stable Diffusion)</div>
+      <div style="font-size:13px; color:var(--warm-black); line-height:1.8;">Overhead top-down view of a wide shallow ceramic dish filled with still, slightly cloudy cream-colored water. Dark ink — warm charcoal and deep umber tones — has already diffused into the water and is mid-settle: organic tendrils and soft cloud-like plumes spread across the right two-thirds of the frame. The left third of the frame is mostly clear, lightly tinted cream water with only the faintest ink wisps at the edges. The ink patterns are delicate and intricate, with soft feathered edges, not hard lines. Lighting is natural, soft, and directional — warm morning light from the upper left casting a very subtle sheen across the water surface. The ceramic dish has a matte off-white rim just barely visible at the edges. No bubbles, no ripples, no movement — perfectly still. Color palette: background water #F5F2EB cream, ink tones #1C1A14 warm black and #5A4A30 umber. Shot with a 50mm macro lens, extremely flat depth of field, medium format film texture, ultra high resolution. No text. No people.</div>
+    </div>
+
+    <div style="background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment); margin-bottom:12px;">
+      <div style="font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-dark); margin-bottom:10px;">Video prompt — feed image above as first frame (Kling 2.0, Runway Gen-4, or Sora)</div>
+      <div style="font-size:13px; color:var(--warm-black); line-height:1.8;">Completely static overhead camera, zero camera movement whatsoever — no pan, no tilt, no zoom, no drift, no shake. The scene from the first frame continues with only the physics of the ink and water: the diffused ink patterns continue their extremely slow, almost imperceptible outward migration through the cream-colored water. The movement is unhurried and meditative — the tendrils advance by only a few millimeters over the full duration of the clip. The ink edges soften and feather further as they spread. No new ink is introduced. No drops fall. No wind disturbs the surface. No ripples. The water remains glassy and still except for the invisible physics of diffusion. The light does not change. The final frame looks nearly identical to the first frame. Duration: 8–10 seconds. Designed to loop seamlessly and invisibly. Mood: silent, patient, meditative.</div>
+    </div>
+
+    <div style="background:var(--paper); border-radius:10px; padding:18px 20px; border:0.5px solid var(--parchment); margin-bottom:8px;">
+      <div style="font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--stone); margin-bottom:10px;">Hero text placement over the video</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div>
+          <div style="font-size:12px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">Text content</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6; margin-bottom:8px;">Line 1: <span style="font-family:var(--font-mono); font-size:11px; color:var(--sage);">EDISON</span> — Cormorant 300, ~80px, letter-spacing: 0.06em</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;">Line 2: <span style="font-family:var(--font-mono); font-size:11px; color:var(--sage);">Building things. Writing thoughts.</span> — Cormorant italic 300, ~20px, color: #8A8070</div>
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:500; color:var(--warm-black); margin-bottom:4px;">Position</div>
+          <div style="font-size:12px; color:var(--warm-gray); line-height:1.6;"><span style="font-family:var(--font-mono); font-size:10px; color:var(--sage);">position: absolute</span><br><span style="font-family:var(--font-mono); font-size:10px; color:var(--sage);">bottom: 10vh; left: 8vw</span><br>Over the clear-water left third. No backdrop or blur behind text. The cream water provides contrast.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <p><b>Looping:</b> In your video editor apply a 1–2 second crossfade dissolve between the last and first frame. At this motion level, the loop is completely invisible. Alternatively use CSS <span style="font-family:var(--font-mono); font-size:11px;">animation-direction: alternate</span> to reverse the clip — forward then backward — which is even more seamless.</p>
+    </div>
+
+    <hr class="divider">
+
+    <h3 style="margin-bottom:6px;">Video 02 — Moments montage</h3>
+    <p style="margin-bottom:16px;">A personal supercut. Real moments, handheld or candid, edited to feel unhurried. This is the section where the site goes from "a developer portfolio" to "a person I want to know." Placed on the homepage between Projects and the Graph teaser — after the visitor has earned the context to appreciate it.</p>
+
+    <div style="background:var(--paper); border-radius:10px; border:0.5px solid var(--parchment); overflow:hidden; margin-bottom:12px;">
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Duration</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">45–90 seconds. Long enough to feel human, short enough to hold attention without autoplay controls becoming awkward. Do not exceed 2 minutes.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Content</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Mix of: building / coding moments, chess, being outside, friends, New York, anything that shows life outside a screen. Specificity beats polish — a shaky clip from a real moment beats a crisp stock-feeling shot.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Editing</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">No jump cuts. Slow cuts, 2–4 seconds per clip. Let each moment breathe. No text overlays, no captions, no title cards inside the video. The visuals carry it.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Color grade</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Warm and slightly desaturated. Pull the highlights toward cream (#F5F2EB) and the shadows toward warm black (#1C1A14). Nothing cool-toned. Consistent across all clips.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Audio</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Muted by default with a visible unmute button — never autoplay with sound. If you include music, one track only, something unhurried and instrumental. No copyright issues: use Epidemic Sound, Artlist, or a royalty-free ambient track.</div>
+      </div>
+      <div style="padding:16px 20px; border-bottom:0.5px solid var(--parchment); display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Layout</div>
+        <div style="font-size:13px; color:var(--warm-gray); line-height:1.6;">Full-bleed width, 16:9 aspect ratio. Eyebrow label above: "moments" in DM Sans 500, letter-spacing 0.1em. A single sentence in Cormorant italic below the video — something genuine, not a caption, more like a note.</div>
+      </div>
+      <div style="padding:16px 20px; display:flex; gap:14px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--stone); min-width:90px; padding-top:1px; text-transform:uppercase;">Caption example</div>
+        <div style="font-size:14px; font-style:italic; font-family:var(--font-display); color:var(--warm-black); line-height:1.6; padding-top:2px;">"Some of the things I'm building toward."</div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <p><b>Why it's here and not in the hero:</b> A montage in the hero is asking someone to watch content before they know if they care. The ink video sets a tone without demanding attention. The montage, placed after Writing and Projects, is earned — by then the visitor already has a reason to want to know you as a person. The sequence matters.</p>
+    </div>
+  </div>
+
+  <!-- 09 GRAPH FEATURE -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">09</span>Signature feature</p>
+    <h2>The photo<br>graph</h2>
+    <p>An Obsidian-style interactive force graph — but instead of connecting notes, it connects photos. Your life as a network. Nodes are photos. Edges are shared tags (place, event, date, theme). Built with D3.js force simulation.</p>
+
+    <div class="graph-canvas" style="margin-top:24px;">
+      <svg width="100%" height="240" viewBox="0 0 860 240" xmlns="http://www.w3.org/2000/svg">
+        <line x1="280" y1="120" x2="430" y2="155" stroke="#7A8B6F" stroke-width="0.8" opacity="0.5"/>
+        <line x1="430" y1="155" x2="570" y2="95" stroke="#7A8B6F" stroke-width="0.8" opacity="0.5"/>
+        <line x1="430" y1="155" x2="220" y2="185" stroke="#7A8B6F" stroke-width="0.8" opacity="0.3"/>
+        <line x1="570" y1="95" x2="680" y2="140" stroke="#7A8B6F" stroke-width="0.8" opacity="0.3"/>
+        <line x1="280" y1="120" x2="220" y2="185" stroke="#7A8B6F" stroke-width="0.8" opacity="0.25"/>
+        <line x1="120" y1="115" x2="280" y2="120" stroke="#7A8B6F" stroke-width="0.8" opacity="0.3"/>
+        <line x1="120" y1="115" x2="220" y2="185" stroke="#7A8B6F" stroke-width="0.8" opacity="0.2"/>
+        <line x1="570" y1="95" x2="500" y2="40" stroke="#7A8B6F" stroke-width="0.8" opacity="0.22"/>
+        <line x1="740" y1="75" x2="680" y2="140" stroke="#7A8B6F" stroke-width="0.8" opacity="0.2"/>
+        <line x1="680" y1="140" x2="770" y2="185" stroke="#7A8B6F" stroke-width="0.8" opacity="0.2"/>
+        <line x1="60" y1="170" x2="120" y2="115" stroke="#7A8B6F" stroke-width="0.8" opacity="0.18"/>
+        <circle cx="430" cy="155" r="26" fill="#2E3D28" stroke="#7A8B6F" stroke-width="1.2"/>
+        <circle cx="280" cy="120" r="18" fill="#263321" stroke="#7A8B6F" stroke-width="0.9" opacity="0.85"/>
+        <circle cx="570" cy="95" r="18" fill="#263321" stroke="#7A8B6F" stroke-width="0.9" opacity="0.85"/>
+        <circle cx="220" cy="185" r="14" fill="#1E2A1A" stroke="#7A8B6F" stroke-width="0.7" opacity="0.7"/>
+        <circle cx="680" cy="140" r="14" fill="#1E2A1A" stroke="#7A8B6F" stroke-width="0.7" opacity="0.7"/>
+        <circle cx="120" cy="115" r="11" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.6" opacity="0.55"/>
+        <circle cx="500" cy="40" r="11" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.6" opacity="0.5"/>
+        <circle cx="740" cy="75" r="10" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.6" opacity="0.45"/>
+        <circle cx="770" cy="185" r="9" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="60" cy="170" r="9" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="810" cy="110" r="7" fill="#1A2418" stroke="#7A8B6F" stroke-width="0.5" opacity="0.3"/>
+        <text x="430" y="192" text-anchor="middle" font-size="9" fill="#7A8B6F" font-family="monospace" opacity="0.8">graduation · 2025</text>
+        <text x="280" y="105" text-anchor="middle" font-size="9" fill="#6A7B5F" font-family="monospace" opacity="0.75">chess club</text>
+        <text x="570" y="80" text-anchor="middle" font-size="9" fill="#6A7B5F" font-family="monospace" opacity="0.75">senior project</text>
+        <text x="120" y="100" text-anchor="middle" font-size="9" fill="#5A6A50" font-family="monospace" opacity="0.6">friends · nyc</text>
+        <text x="680" y="160" text-anchor="middle" font-size="9" fill="#5A6A50" font-family="monospace" opacity="0.55">hackathon</text>
+        <text x="790" y="25" font-size="10" fill="#3A4A32" font-family="monospace" opacity="0.6">/graph</text>
+      </svg>
+    </div>
+
+    <div style="margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div style="background:#141410; border-radius:10px; padding:18px 20px; border:0.5px solid #2A2A20;">
+        <h3 style="color:#C8D0B8; margin-bottom:8px;">Nodes</h3>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Photos rendered as circles, clipped round</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Node size = number of connections (degree)</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20; border-bottom:none;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Hover: photo expands, tags appear below</div>
+        </div>
+      </div>
+      <div style="background:#141410; border-radius:10px; padding:18px 20px; border:0.5px solid #2A2A20;">
+        <h3 style="color:#C8D0B8; margin-bottom:8px;">Edges</h3>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Drawn between photos sharing ≥1 tag</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Opacity scales with number of shared tags</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20; border-bottom:none;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Sage #7A8B6F · 0.8px · animated on load</div>
+        </div>
+      </div>
+      <div style="background:#141410; border-radius:10px; padding:18px 20px; border:0.5px solid #2A2A20;">
+        <h3 style="color:#C8D0B8; margin-bottom:8px;">Interactions</h3>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Drag nodes freely</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Scroll to zoom in/out</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Click node → full photo modal + linked nodes highlight</div>
+        </div>
+        <div class="rule-row" style="border-color:#2A2A20; border-bottom:none;">
+          <div class="rule-dot" style="background:#7A8B6F;"></div>
+          <div class="rule-text" style="color:#6A7A60;">Filter by tag → non-matching nodes fade to 10% opacity</div>
+        </div>
+      </div>
+      <div style="background:#141410; border-radius:10px; padding:18px 20px; border:0.5px solid #2A2A20;">
+        <h3 style="color:#C8D0B8; margin-bottom:8px;">Data schema</h3>
+        <div style="font-family:var(--font-mono); font-size:11px; color:#5A8B5A; line-height:2;">
+          {<br>
+          &nbsp;&nbsp;id: "photo-042",<br>
+          &nbsp;&nbsp;src: "/photos/042.jpg",<br>
+          &nbsp;&nbsp;date: "2025-05-12",<br>
+          &nbsp;&nbsp;tags: ["chess", "nyc",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"senior-year"],<br>
+          &nbsp;&nbsp;caption: "optional"<br>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row" style="margin-top:16px; border-left-color:#7A8B6F; background:#1A1A12;">
+      <p style="color:#6A7A60;"><b style="color:#B8C8A8;">The entrance transition:</b> Navigating to /graph fades the cream background to #0F0E0B over 800ms. The graph nodes drift in from the center. This moment — the shift from warm light to dark canvas — is the most important single interaction on the site.</p>
+    </div>
+  </div>
+
+  <!-- 10 MOTION -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">10</span>Motion & animation</p>
+    <h2>Motion</h2>
+    <p>Purposeful and minimal. No scroll animations — they look try-hard. Transitions are fast. The graph is the one place motion is allowed to be expressive.</p>
+
+    <div style="background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment); margin-top:24px;">
+      <div class="motion-row">
+        <div class="motion-element">Page transitions</div>
+        <div class="motion-spec">fade · 150ms ease</div>
+        <div class="motion-note">Subtle cross-fade between routes. Fast enough to feel instant.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Nav on scroll</div>
+        <div class="motion-spec">bg: transparent → cream<br>200ms ease</div>
+        <div class="motion-note">Background fills in as user scrolls past hero.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Hero video loop</div>
+        <div class="motion-spec">autoplay · muted<br>loop · playsinline</div>
+        <div class="motion-note">Video starts immediately on page load, no click required. object-fit: cover fills the viewport. No controls shown.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Montage autoplay</div>
+        <div class="motion-spec">autoplay · muted<br>IntersectionObserver</div>
+        <div class="motion-note">Starts playing when scrolled into view (≥50% visible). Pauses when scrolled away. Unmute button top-right corner.</div>
+      </div>
+        <div class="motion-spec">color → sage · 100ms</div>
+        <div class="motion-note">Instant enough to feel responsive. Sage on hover only.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Button hover</div>
+        <div class="motion-spec">opacity: 0.85 · 100ms</div>
+        <div class="motion-note">Primary button dims slightly. Ghost button background fills paper.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Post card hover</div>
+        <div class="motion-spec">title: → sage · 150ms</div>
+        <div class="motion-note">Post title color shifts to sage on hover. No translate, no scale.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Graph — ambient drift</div>
+        <div class="motion-spec">alphaDecay: 0.002<br>velocityDecay: 0.4</div>
+        <div class="motion-note">Nodes drift very slowly when idle. Almost imperceptible — feels alive.</div>
+      </div>
+      <div class="motion-row">
+        <div class="motion-element">Graph — entrance</div>
+        <div class="motion-spec">bg fade: 800ms ease<br>nodes: stagger 20ms</div>
+        <div class="motion-note">The dark canvas fades in. Nodes appear staggered from center outward.</div>
+      </div>
+      <div class="motion-row" style="border-bottom:none;">
+        <div class="motion-element">Graph — node hover</div>
+        <div class="motion-spec">r: scale 1.3 · 200ms<br>connected edges: +opacity</div>
+        <div class="motion-note">Hovered node grows. Connected nodes and edges brighten. Everything else dims to 20%.</div>
+      </div>
+    </div>
+
+    <div class="info-row" style="margin-top:16px;">
+      <p><b>The rule:</b> If you're adding an animation and its purpose isn't immediately obvious, remove it. Motion should communicate state changes, not decorate.</p>
+    </div>
+  </div>
+
+  <!-- 11 VOICE -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">11</span>Voice & tone</p>
+    <h2>Voice</h2>
+    <p>Write the way you talk to someone smart who isn't in your CS program. Specific and honest. No jargon without context. No résumé-speak. First person throughout.</p>
+
+    <div class="voice-compare">
+      <div class="voice-col bad">
+        <div class="voice-col-label">don't write this</div>
+        <div class="voice-example">"I have experience with data structures, algorithms, and full-stack development using modern frameworks and best practices."</div>
+      </div>
+      <div class="voice-col good">
+        <div class="voice-col-label">write this instead</div>
+        <div class="voice-example">"I've built a chess engine that beats me about 70% of the time, and websites for three restaurants in my neighborhood."</div>
+      </div>
+    </div>
+
+    <div class="voice-compare" style="margin-top:1px;">
+      <div class="voice-col bad">
+        <div class="voice-col-label">don't write this</div>
+        <div class="voice-example">"In this post, I will explore the implementation of alpha-beta pruning as an optimization technique for game tree search algorithms."</div>
+      </div>
+      <div class="voice-col good">
+        <div class="voice-col-label">write this instead</div>
+        <div class="voice-example">"I kept wondering why my chess AI would blunder obvious pieces. Turns out it was evaluating 8 million nodes a second and still playing like my little cousin."</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; background:var(--paper); border-radius:10px; padding:20px 24px; border:0.5px solid var(--parchment);">
+      <div class="rule-row">
+        <div class="rule-dot"></div>
+        <div class="rule-text"><span class="rule-strong">Post titles: lowercase.</span> "building a chess engine from scratch" not "Building A Chess Engine From Scratch"</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-dot"></div>
+        <div class="rule-text"><span class="rule-strong">Lead with the interesting thing.</span> Don't bury the lede in "background" or "motivation" sections.</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-dot"></div>
+        <div class="rule-text"><span class="rule-strong">Short paragraphs.</span> Max 3–4 sentences. Blog reading is scanning. Give the eye places to land.</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-dot"></div>
+        <div class="rule-text"><span class="rule-strong">Be specific about failure.</span> "I got this wrong for two days" is more interesting than "after some debugging."</div>
+      </div>
+      <div class="rule-row" style="border-bottom:none;">
+        <div class="rule-dot"></div>
+        <div class="rule-text"><span class="rule-strong">No skills section.</span> "JavaScript, Python, React" on a resume is fine. On a personal site it reads as insecure. Let the projects speak.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 TECH STACK -->
+  <div class="spec-section">
+    <p class="eyebrow"><span class="big-num">12</span>Tech stack</p>
+    <h2>Stack</h2>
+
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-card-name">Next.js 14</div>
+        <div class="stack-card-why">App Router. Static generation for blog posts. React for the graph page. You'll use this in college — good to know now.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-name">Tailwind CSS</div>
+        <div class="stack-card-why">Use CSS variables for the brand tokens. Tailwind for spacing, layout, responsive. No fighting the cascade.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-name">MDX</div>
+        <div class="stack-card-why">Blog posts in Markdown with React components. Lets you embed the chess widget or code demos directly in posts.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-name">D3.js</div>
+        <div class="stack-card-why">Force simulation for the graph. forceSimulation, forceLink, forceManyBody, forceCenter. Use d3-zoom for pan/zoom.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-name">Vercel</div>
+        <div class="stack-card-why">Deploy straight from GitHub. Automatic preview URLs per branch. Free tier covers this entirely.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-name">Google Fonts</div>
+        <div class="stack-card-why">Cormorant Garamond, DM Sans, Lora, JetBrains Mono. Load with next/font for zero layout shift.</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px; margin-bottom:4px;">File structure</h3>
+    <div class="tree">
+      <span class="tree-dir">app/</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">page.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← home</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">writing/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">page.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← post list</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">[slug]/page.tsx</span>&nbsp;<span class="tree-comment">← single post</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">projects/page.tsx</span>&nbsp;&nbsp;<span class="tree-comment">← formal portfolio</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">playground/page.tsx</span>&nbsp;<span class="tree-comment">← interactive demos</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">graph/page.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← full-screen D3</span><br>
+      &nbsp;&nbsp;<span class="tree-dir">about/page.tsx</span><br>
+      <span class="tree-dir">content/posts/</span><br>
+      &nbsp;&nbsp;<span class="tree-file">chess-engine.mdx</span><br>
+      &nbsp;&nbsp;<span class="tree-file">restaurant-sites.mdx</span><br>
+      <span class="tree-dir">components/</span><br>
+      &nbsp;&nbsp;<span class="tree-file">Nav.tsx</span><br>
+      &nbsp;&nbsp;<span class="tree-file">HeroVideo.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← ink loop, text overlay</span><br>
+      &nbsp;&nbsp;<span class="tree-file">Montage.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← IntersectionObserver</span><br>
+      &nbsp;&nbsp;<span class="tree-file">DemoCard.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← expand/collapse demo</span><br>
+      &nbsp;&nbsp;<span class="tree-file">Sandbox.tsx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← CodeMirror + preview</span><br>
+      &nbsp;&nbsp;<span class="tree-file">PostCard.tsx</span><br>
+      &nbsp;&nbsp;<span class="tree-file">ProjectCard.tsx</span><br>
+      &nbsp;&nbsp;<span class="tree-file">PhotoGraph.tsx</span>&nbsp;&nbsp;&nbsp;<span class="tree-comment">← D3 component</span><br>
+      <span class="tree-dir">public/videos/</span><br>
+      &nbsp;&nbsp;<span class="tree-file">hero-loop.mp4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← ink diffusion, ≤8MB</span><br>
+      &nbsp;&nbsp;<span class="tree-file">montage.mp4</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← moments, 45–90s</span><br>
+      <span class="tree-dir">public/photos/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← graph images</span><br>
+      <span class="tree-file">photo-data.json</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← nodes + tags</span><br>
+      <span class="tree-file">demos.json</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">← playground metadata</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="padding:48px 0 0; display:flex; justify-content:space-between; align-items:center; border-top:0.5px solid var(--parchment);">
+    <span style="font-family:var(--font-display); font-size:18px; font-weight:300; letter-spacing:0.04em; color:var(--stone);">EDISON — Brand Spec v1.2</span>
+    <span style="font-family:var(--font-mono); font-size:10px; color:var(--parchment);">Generated 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
