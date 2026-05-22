@@ -20,16 +20,28 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    background: var(--cream); color: var(--warm-black);
+    background-color: var(--cream);
+    background-image:
+      radial-gradient(ellipse at 90% 0%, rgba(122,139,111,0.10) 0%, transparent 52%),
+      radial-gradient(ellipse at 10% 100%, rgba(184,106,62,0.07) 0%, transparent 48%);
+    color: var(--warm-black);
     font-family: var(--font-ui); font-size: 15px; line-height: 1.7;
     -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 999;
+    background: linear-gradient(90deg, var(--clay) 0%, var(--clay-light) 30%, var(--sage-light) 65%, transparent 100%);
   }
 
   .page { max-width: 580px; margin: 0 auto; padding: 96px 32px 120px; }
 
   .page-header {
     display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 56px; border-bottom: 0.5px solid var(--parchment); padding-bottom: 24px;
+    margin-bottom: 56px; padding-bottom: 24px; position: relative;
+  }
+  .page-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 0.5px;
+    background: linear-gradient(90deg, var(--clay-light) 0%, var(--parchment) 45%, transparent 100%);
   }
   .page-title {
     font-family: var(--font-display); font-size: 36px;
@@ -50,7 +62,7 @@
   .form-label {
     display: block; font-family: var(--font-mono); font-size: 10px;
     font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--stone); margin-bottom: 8px;
+    color: var(--sage-dark); margin-bottom: 8px;
   }
   .form-input {
     width: 100%; padding: 12px 16px;
@@ -87,9 +99,9 @@
     padding: 12px 28px; border-radius: 3px; cursor: pointer; border: none;
     transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
   }
-  .btn-primary { background: var(--warm-black); color: var(--cream); }
-  .btn-primary:hover { background: #2E2C24; }
-  .btn-primary:active { background: #3A3828; }
+  .btn-primary { background: var(--clay); color: var(--cream); }
+  .btn-primary:hover { background: var(--clay-dark); }
+  .btn-primary:active { background: #6A3A20; }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-ghost { background: transparent; color: var(--stone); border: 0.5px solid var(--parchment); }
   .btn-ghost:hover { color: var(--sage); border-color: var(--sage); }
@@ -99,9 +111,12 @@
   .status.success { background: rgba(74,94,58,0.12); color: var(--sage-dark); border: 0.5px solid var(--sage-dark); }
   .status.error { background: rgba(184,106,62,0.1); color: var(--clay-dark); border: 0.5px solid var(--clay); }
 
-  .divider { height: 0.5px; background: var(--parchment); margin: 56px 0; }
+  .divider {
+    height: 0.5px; margin: 56px 0;
+    background: linear-gradient(90deg, var(--sage-light) 0%, var(--parchment) 40%, transparent 100%);
+  }
 
-  .list-header { font-family: var(--font-mono); font-size: 10px; color: var(--stone); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
+  .list-header { font-family: var(--font-mono); font-size: 10px; color: var(--sage-dark); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
   .photo-list { display: flex; flex-direction: column; }
   .photo-row {
     display: grid; grid-template-columns: 56px 1fr auto;
@@ -112,7 +127,16 @@
   .photo-thumb { width: 56px; height: 56px; border-radius: 4px; object-fit: cover; background: var(--paper); border: 0.5px solid var(--parchment); flex-shrink: 0; }
   .photo-info { min-width: 0; }
   .photo-title { font-family: var(--font-display); font-size: 17px; font-weight: 400; color: var(--warm-black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .photo-meta { font-family: var(--font-mono); font-size: 9px; color: var(--stone); letter-spacing: 0.06em; margin-top: 2px; }
+  .photo-meta { margin-top: 5px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .photo-tag {
+    font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.05em;
+    color: var(--sage-dark); background: rgba(122,139,111,0.13);
+    border: 0.5px solid rgba(122,139,111,0.32); border-radius: 2px; padding: 2px 7px;
+  }
+  .photo-date {
+    font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.06em;
+    color: var(--clay); padding: 2px 4px;
+  }
 
   .photo-actions { display: flex; align-items: center; gap: 4px; }
   .photo-delete, .btn-edit {
@@ -194,7 +218,8 @@
   /* ── EDIT ROW ── */
   .photo-row--editing {
     align-items: start;
-    background: var(--paper); border-radius: 4px; padding: 14px 12px;
+    background: rgba(122,139,111,0.07); border-radius: 4px; padding: 14px 12px;
+    border-top-color: rgba(122,139,111,0.25) !important;
   }
   .photo-row--editing .photo-thumb { margin-top: 3px; }
 
@@ -489,16 +514,14 @@ async function loadPhotoList() {
   data.forEach(n => { photoData[n.id] = n; });
 
   listEl.innerHTML = data.map(n => {
-    const meta = [
-      (n.tags || []).join(' · '),
-      n.date ? dpFmt(n.date) : ''
-    ].filter(Boolean).join(' · ');
+    const tagPills = (n.tags || []).map(t => `<span class="photo-tag">${t}</span>`).join('');
+    const datePill = n.date ? `<span class="photo-date">${dpFmt(n.date)}</span>` : '';
     return `
     <div class="photo-row" id="row-${n.id}">
       <img class="photo-thumb" src="${n.src_url}" alt="">
       <div class="photo-info">
         <div class="photo-title">${n.title}</div>
-        <div class="photo-meta">${meta}</div>
+        <div class="photo-meta">${tagPills}${datePill}</div>
       </div>
       <div class="photo-actions">
         <button class="btn-edit" onclick="editPhoto('${n.id}')">edit</button>
