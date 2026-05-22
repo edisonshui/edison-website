@@ -172,10 +172,12 @@
     opacity: 0; pointer-events: none; transition: opacity 250ms ease;
   }
   .photo-modal.visible { opacity: 1; pointer-events: all; }
-  .modal-inner { background: var(--graph-surface); border: 0.5px solid var(--graph-border); border-radius: 12px; padding: 28px; max-width: 480px; width: calc(100% - 48px); }
-  .modal-img { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; margin-bottom: 16px; background: #1E2418; }
-  .modal-label { font-family: var(--font-mono); font-size: 11px; color: var(--sage); margin-bottom: 6px; }
-  .modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .modal-inner { background: var(--graph-surface); border: 0.5px solid var(--graph-border); border-radius: 14px; overflow: hidden; max-width: 720px; width: calc(100% - 48px); }
+  .modal-img { width: 100%; max-height: 65vh; object-fit: cover; display: block; background: #1A2416; }
+  .modal-body { padding: 20px 24px 24px; }
+  .modal-date { font-family: var(--font-mono); font-size: 9px; color: #3A4A30; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .modal-label { font-family: var(--font-mono); font-size: 11px; color: var(--sage); margin-bottom: 8px; }
+  .modal-tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .modal-tag { font-family: var(--font-mono); font-size: 9px; color: #5A6A50; padding: 3px 9px; border: 0.5px solid #2E3D28; border-radius: 2px; }
   .modal-close { font-family: var(--font-mono); font-size: 10px; color: #3A3A2A; cursor: pointer; float: right; transition: color 150ms ease; }
   .modal-close:hover { color: var(--sage); }
@@ -246,10 +248,13 @@
 
 <div class="photo-modal" id="modal" onclick="closeModal(event)">
   <div class="modal-inner">
-    <span class="modal-close" onclick="closeModal()">close ×</span>
     <img class="modal-img" id="modal-img" src="" alt="">
-    <div class="modal-label" id="modal-label"></div>
-    <div class="modal-tags" id="modal-tags"></div>
+    <div class="modal-body">
+      <span class="modal-close" onclick="closeModal()">close ×</span>
+      <div class="modal-date" id="modal-date"></div>
+      <div class="modal-label" id="modal-label"></div>
+      <div class="modal-tags" id="modal-tags"></div>
+    </div>
   </div>
 </div>
 
@@ -346,20 +351,14 @@ async function initGraph() {
       .on('zoom', e => g.attr('transform', e.transform))
   );
 
-  // ─── PHOTO PATTERNS ────────────────────────────────────────────────────────
+  // ─── CLIP PATHS ────────────────────────────────────────────────────────────
   const defs = svg.append('defs');
   photoNodes.forEach(d => {
-    const pat = defs.append('pattern')
-      .attr('id', `photo-${d.id}`)
-      .attr('patternUnits', 'objectBoundingBox')
-      .attr('width', 1)
-      .attr('height', 1);
-    pat.append('image')
-      .attr('href', d.src_url)
-      .attr('x', 0).attr('y', 0)
-      .attr('width', d.r * 2)
-      .attr('height', d.r * 2)
-      .attr('preserveAspectRatio', 'xMidYMid slice');
+    defs.append('clipPath')
+      .attr('id', `clip-${d.id}`)
+      .attr('clipPathUnits', 'objectBoundingBox')
+      .append('circle')
+      .attr('cx', 0.5).attr('cy', 0.5).attr('r', 0.5);
   });
 
   // ─── SIMULATION ────────────────────────────────────────────────────────────
@@ -389,18 +388,25 @@ async function initGraph() {
         .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
     );
 
-  // Background circle (fallback color while image loads)
+  // Dark fallback circle (visible while image loads)
   node.append('circle')
     .attr('r', d => d.r)
-    .attr('fill', '#1E2A1A');
+    .attr('fill', '#1A2416');
 
-  // Photo circle
+  // Photo image clipped to circle
+  node.append('image')
+    .attr('href', d => d.src_url)
+    .attr('x', d => -d.r).attr('y', d => -d.r)
+    .attr('width', d => d.r * 2).attr('height', d => d.r * 2)
+    .attr('clip-path', d => `url(#clip-${d.id})`)
+    .attr('preserveAspectRatio', 'xMidYMid slice');
+
+  // Stroke ring
   node.append('circle')
     .attr('r', d => d.r)
-    .attr('fill', d => `url(#photo-${d.id})`)
+    .attr('fill', 'none')
     .attr('stroke', '#7A8B6F')
-    .attr('stroke-width', d => d.r > 20 ? 1.2 : 0.8)
-    .attr('opacity', 1);
+    .attr('stroke-width', d => d.r > 20 ? 1.2 : 0.8);
 
   // Labels
   node.append('text')
@@ -415,18 +421,15 @@ async function initGraph() {
 
   // ─── FILTER ────────────────────────────────────────────────────────────────
   function applyFilter() {
-    node.selectAll('circle')
-      .transition().duration(300)
-      .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 1 : 0.08);
-    node.selectAll('text')
-      .transition().duration(300)
+    const vis = d => !activeTag || d.tags.includes(activeTag) ? 1 : 0.08;
+    node.selectAll('circle').transition().duration(300).attr('opacity', vis);
+    node.selectAll('image').transition().duration(300).attr('opacity', vis);
+    node.selectAll('text').transition().duration(300)
       .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 0.7 : 0.04);
-    link
-      .transition().duration(300)
-      .attr('opacity', d => {
-        if (!activeTag) return null;
-        return d.source.tags?.includes(activeTag) && d.target.tags?.includes(activeTag) ? 0.6 : 0.03;
-      });
+    link.transition().duration(300).attr('opacity', d => {
+      if (!activeTag) return null;
+      return d.source.tags?.includes(activeTag) && d.target.tags?.includes(activeTag) ? 0.6 : 0.03;
+    });
   }
 
   // ─── HOVER / CLICK ─────────────────────────────────────────────────────────
@@ -436,9 +439,15 @@ async function initGraph() {
 
   node.on('mouseenter', (e, d) => {
     node.selectAll('circle').attr('opacity', n => n.id === d.id ? 1 : 0.25);
+    node.selectAll('image').attr('opacity', n => n.id === d.id ? 1 : 0.25);
     link.attr('opacity', l => l.source.id === d.id || l.target.id === d.id ? 0.8 : 0.04);
+    const newR = d.r * 1.25;
+    d3.select(e.currentTarget).select('image')
+      .transition().duration(200)
+      .attr('x', -newR).attr('y', -newR)
+      .attr('width', newR * 2).attr('height', newR * 2);
     d3.select(e.currentTarget).selectAll('circle')
-      .transition().duration(200).attr('r', d.r * 1.25).attr('opacity', 1);
+      .transition().duration(200).attr('r', newR).attr('opacity', 1);
 
     tooltipLabel.textContent = d.title;
     tooltipTags.innerHTML = (d.tags || []).map(t => `<span class="tooltip-tag">${t}</span>`).join('');
@@ -450,6 +459,10 @@ async function initGraph() {
   })
   .on('mouseleave', (e, d) => {
     applyFilter();
+    d3.select(e.currentTarget).select('image')
+      .transition().duration(200)
+      .attr('x', -d.r).attr('y', -d.r)
+      .attr('width', d.r * 2).attr('height', d.r * 2);
     d3.select(e.currentTarget).selectAll('circle')
       .transition().duration(200).attr('r', d.r);
     tooltip.classList.remove('visible');
@@ -457,6 +470,7 @@ async function initGraph() {
   .on('click', (e, d) => {
     e.stopPropagation();
     document.getElementById('modal-img').src = d.src_url;
+    document.getElementById('modal-date').textContent = d.date || '';
     document.getElementById('modal-label').textContent = d.title;
     document.getElementById('modal-tags').innerHTML = (d.tags || []).map(t => `<span class="modal-tag">${t}</span>`).join('');
     document.getElementById('modal').classList.add('visible');
@@ -474,6 +488,7 @@ async function initGraph() {
 
   // ─── INTRO ANIMATION ───────────────────────────────────────────────────────
   node.selectAll('circle').attr('r', 0).attr('opacity', 0);
+  node.selectAll('image').attr('opacity', 0);
   node.selectAll('text').attr('opacity', 0);
   link.attr('opacity', 0).attr('stroke-dasharray', function() {
     const len = this.getTotalLength ? this.getTotalLength() : 80;
@@ -497,6 +512,13 @@ async function initGraph() {
       .duration(500)
       .ease(d3.easeBackOut.overshoot(1.4))
       .attr('r', d => d.r)
+      .attr('opacity', 1);
+
+    node.selectAll('image')
+      .transition()
+      .delay((d, i) => 200 + i * 70)
+      .duration(500)
+      .ease(d3.easeBackOut.overshoot(1.4))
       .attr('opacity', 1);
 
     node.selectAll('text')

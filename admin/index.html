@@ -27,8 +27,8 @@
 
   /* ── LAYOUT ── */
   .page {
-    max-width: 640px; margin: 0 auto;
-    padding: 80px 32px 120px;
+    max-width: 580px; margin: 0 auto;
+    padding: 96px 32px 120px;
   }
 
   /* ── HEADER ── */
@@ -46,14 +46,14 @@
     letter-spacing: 0.06em; border-bottom: 0.5px solid transparent;
     padding-bottom: 1px; transition: color 150ms ease, border-color 150ms ease;
   }
-  .back-link:hover { color: var(--clay); border-bottom-color: var(--clay); }
+  .back-link:hover { color: var(--sage); border-bottom-color: var(--sage); }
 
   /* ── VIEWS ── */
   #login-view, #upload-view { display: none; }
   #login-view.active, #upload-view.active { display: block; }
 
   /* ── FORM ELEMENTS ── */
-  .form-section { margin-bottom: 40px; }
+  .form-section { margin-bottom: 56px; }
   .form-label {
     display: block; font-family: var(--font-mono); font-size: 10px;
     font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
@@ -67,7 +67,7 @@
     transition: border-color 150ms ease, background 150ms ease;
     outline: none;
   }
-  .form-input:focus { border-color: var(--clay); background: var(--cream); }
+  .form-input:focus { border-color: var(--sage); background: var(--cream); }
   .form-input::placeholder { color: var(--stone); }
 
   input[type="file"].form-input {
@@ -81,7 +81,7 @@
     margin-right: 12px; transition: background 150ms ease;
   }
   input[type="file"].form-input::-webkit-file-upload-button:hover {
-    background: var(--clay-light);
+    background: var(--sage-light);
   }
 
   .form-hint {
@@ -114,7 +114,7 @@
     background: transparent; color: var(--stone);
     border: 0.5px solid var(--parchment);
   }
-  .btn-ghost:hover { color: var(--clay); border-color: var(--clay); }
+  .btn-ghost:hover { color: var(--sage); border-color: var(--sage); }
 
   /* ── STATUS MESSAGE ── */
   .status {
@@ -128,7 +128,7 @@
 
   /* ── DIVIDER ── */
   .divider {
-    height: 0.5px; background: var(--parchment); margin: 48px 0;
+    height: 0.5px; background: var(--parchment); margin: 56px 0;
   }
 
   /* ── PHOTO LIST ── */
@@ -138,13 +138,13 @@
   }
   .photo-list { display: flex; flex-direction: column; gap: 0; }
   .photo-row {
-    display: grid; grid-template-columns: 48px 1fr auto;
+    display: grid; grid-template-columns: 56px 1fr auto;
     align-items: center; gap: 16px;
-    padding: 14px 0; border-top: 0.5px solid var(--parchment);
+    padding: 16px 0; border-top: 0.5px solid var(--parchment);
   }
   .photo-row:last-child { border-bottom: 0.5px solid var(--parchment); }
   .photo-thumb {
-    width: 48px; height: 48px; border-radius: 4px; object-fit: cover;
+    width: 56px; height: 56px; border-radius: 4px; object-fit: cover;
     background: var(--paper); border: 0.5px solid var(--parchment);
   }
   .photo-info { min-width: 0; }
@@ -163,7 +163,7 @@
     transition: color 150ms ease, border-color 150ms ease;
     background: none;
   }
-  .photo-delete:hover { color: var(--clay); border-color: var(--clay-light); }
+  .photo-delete:hover { color: var(--sage); border-color: var(--sage-light); }
 
   .list-empty {
     font-family: var(--font-mono); font-size: 11px; color: var(--stone);
