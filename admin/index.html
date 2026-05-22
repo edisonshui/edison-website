@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Edison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-gray: #8A8070; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --clay: #B86A3E; --clay-light: #E8C8A8; --clay-dark: #7A4A28;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--cream); color: var(--warm-black);
+    font-family: var(--font-ui); font-size: 15px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    max-width: 640px; margin: 0 auto;
+    padding: 80px 32px 120px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 56px; border-bottom: 0.5px solid var(--parchment); padding-bottom: 24px;
+  }
+  .page-title {
+    font-family: var(--font-display); font-size: 36px;
+    font-weight: 300; letter-spacing: -0.01em; color: var(--warm-black);
+  }
+  .page-title em { font-style: italic; color: var(--clay); }
+  .back-link {
+    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
+    letter-spacing: 0.06em; border-bottom: 0.5px solid transparent;
+    padding-bottom: 1px; transition: color 150ms ease, border-color 150ms ease;
+  }
+  .back-link:hover { color: var(--clay); border-bottom-color: var(--clay); }
+
+  /* ── VIEWS ── */
+  #login-view, #upload-view { display: none; }
+  #login-view.active, #upload-view.active { display: block; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-section { margin-bottom: 40px; }
+  .form-label {
+    display: block; font-family: var(--font-mono); font-size: 10px;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--stone); margin-bottom: 8px;
+  }
+  .form-input {
+    width: 100%; padding: 12px 16px;
+    border: 0.5px solid var(--parchment); border-radius: 4px;
+    background: var(--paper); color: var(--warm-black);
+    font-family: var(--font-ui); font-size: 14px;
+    transition: border-color 150ms ease, background 150ms ease;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--clay); background: var(--cream); }
+  .form-input::placeholder { color: var(--stone); }
+
+  input[type="file"].form-input {
+    padding: 10px 16px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  input[type="file"].form-input::-webkit-file-upload-button {
+    font-family: var(--font-mono); font-size: 10px;
+    background: var(--parchment); border: 0.5px solid var(--stone);
+    padding: 4px 10px; border-radius: 2px; cursor: pointer;
+    margin-right: 12px; transition: background 150ms ease;
+  }
+  input[type="file"].form-input::-webkit-file-upload-button:hover {
+    background: var(--clay-light);
+  }
+
+  .form-hint {
+    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
+    margin-top: 6px; letter-spacing: 0.04em;
+  }
+
+  /* ── PREVIEW ── */
+  #img-preview {
+    width: 120px; height: 120px; border-radius: 6px; object-fit: cover;
+    border: 0.5px solid var(--parchment); background: var(--paper);
+    margin-top: 12px; display: none;
+  }
+  #img-preview.visible { display: block; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    padding: 12px 28px; border-radius: 3px; cursor: pointer; border: none;
+    transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
+  }
+  .btn-primary {
+    background: var(--warm-black); color: var(--cream);
+  }
+  .btn-primary:hover { background: #2E2C24; }
+  .btn-primary:active { background: #3A3828; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent; color: var(--stone);
+    border: 0.5px solid var(--parchment);
+  }
+  .btn-ghost:hover { color: var(--clay); border-color: var(--clay); }
+
+  /* ── STATUS MESSAGE ── */
+  .status {
+    font-family: var(--font-mono); font-size: 11px;
+    padding: 10px 14px; border-radius: 4px; margin-top: 16px;
+    display: none;
+  }
+  .status.visible { display: block; }
+  .status.success { background: rgba(74,94,58,0.12); color: var(--sage-dark); border: 0.5px solid var(--sage-dark); }
+  .status.error { background: rgba(184,106,62,0.1); color: var(--clay-dark); border: 0.5px solid var(--clay); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 0.5px; background: var(--parchment); margin: 48px 0;
+  }
+
+  /* ── PHOTO LIST ── */
+  .list-header {
+    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;
+  }
+  .photo-list { display: flex; flex-direction: column; gap: 0; }
+  .photo-row {
+    display: grid; grid-template-columns: 48px 1fr auto;
+    align-items: center; gap: 16px;
+    padding: 14px 0; border-top: 0.5px solid var(--parchment);
+  }
+  .photo-row:last-child { border-bottom: 0.5px solid var(--parchment); }
+  .photo-thumb {
+    width: 48px; height: 48px; border-radius: 4px; object-fit: cover;
+    background: var(--paper); border: 0.5px solid var(--parchment);
+  }
+  .photo-info { min-width: 0; }
+  .photo-title {
+    font-family: var(--font-display); font-size: 17px; font-weight: 400;
+    color: var(--warm-black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .photo-meta {
+    font-family: var(--font-mono); font-size: 9px; color: var(--stone);
+    letter-spacing: 0.06em; margin-top: 2px;
+  }
+  .photo-delete {
+    font-family: var(--font-mono); font-size: 9px; color: #C8B8A8;
+    letter-spacing: 0.06em; cursor: pointer; padding: 4px 8px;
+    border: 0.5px solid transparent; border-radius: 2px;
+    transition: color 150ms ease, border-color 150ms ease;
+    background: none;
+  }
+  .photo-delete:hover { color: var(--clay); border-color: var(--clay-light); }
+
+  .list-empty {
+    font-family: var(--font-mono); font-size: 11px; color: var(--stone);
+    padding: 24px 0; text-align: center;
+  }
+
+  /* ── LOGOUT ── */
+  .logout-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .logged-in-as {
+    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
+    letter-spacing: 0.06em;
+  }
+  .logged-in-as strong { color: var(--warm-gray); }
+
+  /* ── SPINNER ── */
+  .spinner {
+    display: inline-block; width: 12px; height: 12px;
+    border: 1.5px solid rgba(245,242,235,0.3); border-top-color: var(--cream);
+    border-radius: 50%; animation: spin 600ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">graph <em>admin</em></h1>
+    <a href="/graph" class="back-link">← graph</a>
+  </header>
+
+  <!-- LOGIN VIEW -->
+  <div id="login-view">
+    <div class="form-section">
+      <label class="form-label" for="email">email</label>
+      <input class="form-input" type="email" id="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+    <div class="form-section">
+      <label class="form-label" for="password">password</label>
+      <input class="form-input" type="password" id="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
+      sign in
+    </button>
+    <div class="status" id="login-status"></div>
+  </div>
+
+  <!-- UPLOAD VIEW -->
+  <div id="upload-view">
+
+    <div class="logout-row">
+      <span class="logged-in-as">signed in as <strong id="user-email"></strong></span>
+      <button class="btn btn-ghost" onclick="handleLogout()">sign out</button>
+    </div>
+
+    <form id="upload-form" onsubmit="handleUpload(event)">
+      <div class="form-section">
+        <label class="form-label" for="file">photo</label>
+        <input class="form-input" type="file" id="file" accept="image/jpeg,image/png,image/webp" required>
+        <img id="img-preview" alt="preview">
+        <p class="form-hint">jpeg · png · webp</p>
+      </div>
+      <div class="form-section">
+        <label class="form-label" for="title">title</label>
+        <input class="form-input" type="text" id="title" placeholder="graduation · 2025" required>
+      </div>
+      <div class="form-section">
+        <label class="form-label" for="tags">tags</label>
+        <input class="form-input" type="text" id="tags" placeholder="nyc, friends, senior-year">
+        <p class="form-hint">comma-separated · lowercase</p>
+      </div>
+      <div class="form-section">
+        <label class="form-label" for="date">date</label>
+        <input class="form-input" type="date" id="date">
+      </div>
+      <button class="btn btn-primary" type="submit" id="upload-btn">
+        upload to graph
+      </button>
+      <div class="status" id="upload-status"></div>
+    </form>
+
+    <div class="divider"></div>
+
+    <p class="list-header">all photos</p>
+    <div class="photo-list" id="photo-list">
+      <p class="list-empty">loading...</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://gocoagynibdrqhalhtiz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvY29hZ3luaWJkcnFoYWxodGl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU4MjYsImV4cCI6MjA5NTAzMTgyNn0.-DoLtBAHK-tLZDs5yd4rJRN2_ptZCiSS28MJQ_J2vGU';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ─── VIEWS ───────────────────────────────────────────────────────────────────
+function showLogin()  { document.getElementById('login-view').className  = 'active'; document.getElementById('upload-view').className = ''; }
+function showUpload() { document.getElementById('upload-view').className = 'active'; document.getElementById('login-view').className  = ''; }
+
+function setStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `status ${type} visible`;
+}
+function clearStatus(id) {
+  const el = document.getElementById(id);
+  el.className = 'status';
+  el.textContent = '';
+}
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+async function handleLogin() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('login-btn');
+
+  clearStatus('login-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> signing in…';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  btn.disabled = false;
+  btn.textContent = 'sign in';
+
+  if (error) {
+    setStatus('login-status', error.message, 'error');
+    return;
+  }
+
+  enterUploadView(data.user);
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  showLogin();
+}
+
+function enterUploadView(user) {
+  document.getElementById('user-email').textContent = user.email;
+  showUpload();
+  loadPhotoList();
+}
+
+// ─── FILE PREVIEW ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('file').addEventListener('change', e => {
+    const file = e.target.files[0];
+    const preview = document.getElementById('img-preview');
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.classList.add('visible');
+    } else {
+      preview.classList.remove('visible');
+    }
+  });
+});
+
+// ─── UPLOAD ──────────────────────────────────────────────────────────────────
+async function handleUpload(e) {
+  e.preventDefault();
+  clearStatus('upload-status');
+
+  const file   = document.getElementById('file').files[0];
+  const title  = document.getElementById('title').value.trim();
+  const tagsRaw = document.getElementById('tags').value;
+  const date   = document.getElementById('date').value || null;
+  const btn    = document.getElementById('upload-btn');
+
+  const tags = tagsRaw
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean);
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> uploading…';
+
+  // 1. Upload image to storage
+  const ext      = file.name.split('.').pop();
+  const filename = `${Date.now()}.${ext}`;
+
+  const { error: storageErr } = await sb.storage.from('photos').upload(filename, file, {
+    cacheControl: '31536000',
+    upsert: false,
+  });
+
+  if (storageErr) {
+    setStatus('upload-status', `storage: ${storageErr.message}`, 'error');
+    btn.disabled = false;
+    btn.textContent = 'upload to graph';
+    return;
+  }
+
+  // 2. Get public URL
+  const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(filename);
+
+  // 3. Insert row
+  const { error: dbErr } = await sb.from('nodes').insert({ title, src_url: publicUrl, tags, date });
+
+  btn.disabled = false;
+  btn.textContent = 'upload to graph';
+
+  if (dbErr) {
+    setStatus('upload-status', `database: ${dbErr.message}`, 'error');
+    return;
+  }
+
+  setStatus('upload-status', `"${title}" added to the graph.`, 'success');
+  document.getElementById('upload-form').reset();
+  document.getElementById('img-preview').classList.remove('visible');
+  loadPhotoList();
+}
+
+// ─── PHOTO LIST ──────────────────────────────────────────────────────────────
+async function loadPhotoList() {
+  const listEl = document.getElementById('photo-list');
+  listEl.innerHTML = '<p class="list-empty">loading…</p>';
+
+  const { data, error } = await sb.from('nodes').select('*').order('created_at', { ascending: false });
+
+  if (error || !data?.length) {
+    listEl.innerHTML = '<p class="list-empty">no photos yet.</p>';
+    return;
+  }
+
+  listEl.innerHTML = data.map(n => `
+    <div class="photo-row" id="row-${n.id}">
+      <img class="photo-thumb" src="${n.src_url}" alt="${n.title}">
+      <div class="photo-info">
+        <div class="photo-title">${n.title}</div>
+        <div class="photo-meta">${(n.tags || []).join(' · ')}${n.date ? ' · ' + n.date : ''}</div>
+      </div>
+      <button class="photo-delete" onclick="deletePhoto('${n.id}', '${n.src_url}')">delete</button>
+    </div>
+  `).join('');
+}
+
+async function deletePhoto(id, srcUrl) {
+  if (!confirm('Remove this photo from the graph?')) return;
+
+  // Extract filename from the URL for storage deletion
+  const filename = srcUrl.split('/').pop();
+
+  await sb.storage.from('photos').remove([filename]);
+  const { error } = await sb.from('nodes').delete().eq('id', id);
+
+  if (error) { alert(error.message); return; }
+
+  const row = document.getElementById(`row-${id}`);
+  if (row) row.remove();
+  if (!document.querySelector('.photo-row')) {
+    document.getElementById('photo-list').innerHTML = '<p class="list-empty">no photos yet.</p>';
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    enterUploadView(session.user);
+  } else {
+    showLogin();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

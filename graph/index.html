@@ -180,6 +180,15 @@
   .modal-close { font-family: var(--font-mono); font-size: 10px; color: #3A3A2A; cursor: pointer; float: right; transition: color 150ms ease; }
   .modal-close:hover { color: var(--sage); }
 
+  /* EMPTY STATE */
+  #empty-state {
+    position: fixed; inset: 0; z-index: 50;
+    display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+    font-family: var(--font-mono); font-size: 11px; color: #3A3A2A; text-align: center;
+  }
+  #empty-state.visible { display: flex; }
+  #empty-state a { color: var(--sage); border-bottom: 0.5px solid var(--sage-dark); padding-bottom: 1px; }
+
   @media (max-width: 700px) {
     .nav { padding: 0 24px; }
     .filter-panel { left: 24px; bottom: 24px; }
@@ -196,7 +205,7 @@
     <div class="intro-title">My life,<br><em>as a network.</em></div>
     <div class="intro-divider"></div>
     <div class="intro-meta">
-      <span id="intro-nodes">nodes: 14</span>
+      <span id="intro-nodes">nodes: —</span>
       <span class="intro-sep">·</span>
       <span id="intro-edges">edges: <span id="intro-edge-count">—</span></span>
     </div>
@@ -208,6 +217,11 @@
 </div>
 
 <svg id="graph-canvas"></svg>
+
+<div id="empty-state">
+  <span>no photos yet.</span>
+  <span><a href="/admin">upload one →</a></span>
+</div>
 
 <nav class="nav">
   <a href="/" class="nav-brand">EDISON</a>
@@ -244,254 +258,275 @@
   filter by tag ←
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script>
-const photoNodes = [
-  { id: 0, color: '#3D5232', label: 'graduation · 2025', tags: ['graduation','senior-year','nyc'], r: 28 },
-  { id: 1, color: '#2E4226', label: 'chess club', tags: ['chess','senior-year'], r: 20 },
-  { id: 2, color: '#35492C', label: 'senior project', tags: ['senior-year','web','code'], r: 22 },
-  { id: 3, color: '#3A3020', label: 'friends · nyc', tags: ['nyc','friends'], r: 18 },
-  { id: 4, color: '#2C3E28', label: 'hackathon', tags: ['code','friends'], r: 18 },
-  { id: 5, color: '#3E2E1A', label: 'family', tags: ['family','nyc'], r: 16 },
-  { id: 6, color: '#3A3020', label: 'central park', tags: ['nyc','friends'], r: 16 },
-  { id: 7, color: '#243620', label: 'tournament', tags: ['chess'], r: 13 },
-  { id: 8, color: '#283A22', label: 'late nights', tags: ['code','senior-year'], r: 15 },
-  { id: 9, color: '#2E2E1E', label: 'overlake', tags: ['senior-year'], r: 13 },
-  { id: 10, color: '#2A2E1C', label: 'coffee mornings', tags: ['nyc','thoughts'], r: 11 },
-  { id: 11, color: '#303020', label: 'club fair', tags: ['senior-year','chess'], r: 14 },
-  { id: 12, color: '#203018', label: 'debugging', tags: ['code','thoughts'], r: 13 },
-  { id: 13, color: '#2A2818', label: 'constitution hill', tags: ['nyc','friends'], r: 12 },
-];
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://gocoagynibdrqhalhtiz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvY29hZ3luaWJkcnFoYWxodGl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU4MjYsImV4cCI6MjA5NTAzMTgyNn0.-DoLtBAHK-tLZDs5yd4rJRN2_ptZCiSS28MJQ_J2vGU';
 
-// Generate links from shared tags
-const links = [];
-for (let i = 0; i < photoNodes.length; i++) {
-  for (let j = i + 1; j < photoNodes.length; j++) {
-    const shared = photoNodes[i].tags.filter(t => photoNodes[j].tags.includes(t));
-    if (shared.length) links.push({ source: i, target: j, strength: shared.length });
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function buildEdges(nodes) {
+  const links = [];
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const shared = nodes[i].tags.filter(t => nodes[j].tags.includes(t));
+      if (shared.length) links.push({ source: nodes[i].id, target: nodes[j].id, strength: shared.length });
+    }
   }
+  return links;
 }
 
-const allTags = [...new Set(photoNodes.flatMap(n => n.tags))].sort();
-let activeTag = null;
-
-// Tag filter UI
-const filterWrap = document.getElementById('tag-filters');
-const allBtn = document.createElement('button');
-allBtn.className = 'filter-tag all-tag active';
-allBtn.textContent = 'all';
-allBtn.dataset.tag = '';
-filterWrap.appendChild(allBtn);
-allTags.forEach(tag => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-tag';
-  btn.textContent = tag;
-  btn.dataset.tag = tag;
-  filterWrap.appendChild(btn);
-});
-
-filterWrap.addEventListener('click', e => {
-  const btn = e.target.closest('.filter-tag');
-  if (!btn) return;
-  filterWrap.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeTag = btn.dataset.tag || null;
-  applyFilter();
-});
-
-function applyFilter() {
-  node.selectAll('circle')
-    .transition().duration(300)
-    .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 1 : 0.08);
-  node.selectAll('text')
-    .transition().duration(300)
-    .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 0.7 : 0.04);
-  link
-    .transition().duration(300)
-    .attr('opacity', d => {
-      if (!activeTag) return null;
-      return d.source.tags?.includes(activeTag) && d.target.tags?.includes(activeTag) ? 0.6 : 0.03;
-    });
-}
-
-const W = window.innerWidth;
-const H = window.innerHeight;
-
-const svg = d3.select('#graph-canvas')
-  .attr('width', W).attr('height', H);
-
-// Outer group for zoom/pan
-const g = svg.append('g');
-
-// Zoom
-svg.call(
-  d3.zoom().scaleExtent([0.25, 5])
-    .on('zoom', e => g.attr('transform', e.transform))
-);
-
-// Simulation
-const sim = d3.forceSimulation(photoNodes)
-  .force('link', d3.forceLink(links).id(d => d.id).distance(d => 120 + (d.source.r + d.target.r) * 1.8).strength(0.25))
-  .force('charge', d3.forceManyBody().strength(d => -d.r * 32))
-  .force('center', d3.forceCenter(W / 2, H / 2).strength(0.04))
-  .force('collision', d3.forceCollide().radius(d => d.r + 24))
-  .alphaDecay(0.012)
-  .velocityDecay(0.4);
-
-// Edges
-const link = g.append('g').selectAll('line')
-  .data(links).join('line')
-  .attr('stroke', '#7A8B6F')
-  .attr('stroke-width', d => 0.6 + d.strength * 0.2)
-  .attr('opacity', d => 0.2 + d.strength * 0.1);
-
-// Nodes
-const node = g.append('g').selectAll('g')
-  .data(photoNodes).join('g')
-  .style('cursor', 'pointer')
-  .call(
-    d3.drag()
-      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; })
-      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
-      .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
-  );
-
-// Clip paths for circular images
-const defs = svg.append('defs');
-photoNodes.forEach(d => {
-  defs.append('clipPath').attr('id', `clip-${d.id}`)
-    .append('circle').attr('r', d.r);
-});
-
-node.append('circle')
-  .attr('r', d => d.r)
-  .attr('fill', d => d.color)
-  .attr('stroke', '#7A8B6F')
-  .attr('stroke-width', d => d.r > 20 ? 1.2 : 0.8)
-  .attr('opacity', 1);
-
-// Labels
-node.append('text')
-  .text(d => d.label)
-  .attr('y', d => d.r + 14)
-  .attr('text-anchor', 'middle')
-  .attr('font-family', "'JetBrains Mono', monospace")
-  .attr('font-size', d => d.r > 20 ? 9 : 8)
-  .attr('fill', '#6A7B5F')
-  .attr('opacity', 0.7)
-  .attr('pointer-events', 'none');
-
-// Hover
-const tooltip = document.getElementById('tooltip');
-const tooltipLabel = document.getElementById('tooltip-label');
-const tooltipTags = document.getElementById('tooltip-tags');
-
-node.on('mouseenter', (e, d) => {
-  node.selectAll('circle').attr('opacity', n => n.id === d.id ? 1 : 0.25);
-  link.attr('opacity', l => l.source.id === d.id || l.target.id === d.id ? 0.8 : 0.04);
-  d3.select(e.currentTarget).select('circle')
-    .transition().duration(200).attr('r', d.r * 1.25).attr('opacity', 1);
-
-  tooltipLabel.textContent = d.label;
-  tooltipTags.innerHTML = d.tags.map(t => `<span class="tooltip-tag">${t}</span>`).join('');
-  tooltip.classList.add('visible');
-})
-.on('mousemove', e => {
-  tooltip.style.left = (e.clientX + 16) + 'px';
-  tooltip.style.top = (e.clientY - 8) + 'px';
-})
-.on('mouseleave', (e, d) => {
-  applyFilter();
-  d3.select(e.currentTarget).select('circle')
-    .transition().duration(200).attr('r', d.r);
-  tooltip.classList.remove('visible');
-})
-.on('click', (e, d) => {
-  e.stopPropagation();
-  document.getElementById('modal-img').src = `https://placehold.co/480x480/${d.color.replace('#','')}/7A8B6F?text=`;
-  document.getElementById('modal-label').textContent = d.label;
-  document.getElementById('modal-tags').innerHTML = d.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
-  document.getElementById('modal').classList.add('visible');
-});
-
-svg.on('click', () => closeModal());
-
+// ─── MODAL (global so inline onclick handlers work) ──────────────────────────
 function closeModal(e) {
   if (!e || e.target === document.getElementById('modal')) {
     document.getElementById('modal').classList.remove('visible');
   }
 }
 
-// Tick
-sim.on('tick', () => {
-  link
-    .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-  node.attr('transform', d => `translate(${d.x},${d.y})`);
-});
+// ─── MAIN ────────────────────────────────────────────────────────────────────
+async function initGraph() {
+  const { data, error } = await sb.from('nodes').select('*').order('date', { ascending: false });
 
+  if (error || !data?.length) {
+    document.getElementById('intro-overlay').classList.add('done');
+    document.getElementById('empty-state').classList.add('visible');
+    return;
+  }
 
-// Set edge count in intro overlay
-document.getElementById('intro-edge-count').textContent = links.length;
+  const photoNodes = data.map(n => ({
+    ...n,
+    r: Math.min(32, 12 + (n.tags?.length || 0) * 3),
+  }));
 
-// Initially hide all nodes and edges — they'll animate in after the overlay leaves
-node.selectAll('circle').attr('r', 0).attr('opacity', 0);
-node.selectAll('text').attr('opacity', 0);
-link.attr('opacity', 0).attr('stroke-dasharray', function() {
-  const len = this.getTotalLength ? this.getTotalLength() : 80;
-  return `${len} ${len}`;
-}).attr('stroke-dashoffset', function() {
-  const len = this.getTotalLength ? this.getTotalLength() : 80;
-  return len;
-});
+  const links = buildEdges(photoNodes);
+  const allTags = [...new Set(photoNodes.flatMap(n => n.tags || []))].sort();
+  let activeTag = null;
 
-// Intro sequence: hold title, then exit overlay, then assemble graph
-const HOLD_MS   = 1500; // how long title shows
-const EXIT_MS   = 800;  // overlay fade duration
-const introEl   = document.getElementById('intro-overlay');
+  // Update intro counts
+  document.getElementById('intro-nodes').textContent = `nodes: ${photoNodes.length}`;
+  document.getElementById('intro-edge-count').textContent = links.length;
 
-setTimeout(() => {
-  // Trigger overlay fade out
-  introEl.classList.add('exiting');
+  // ─── TAG FILTER UI ─────────────────────────────────────────────────────────
+  const filterWrap = document.getElementById('tag-filters');
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-tag all-tag active';
+  allBtn.textContent = 'all';
+  allBtn.dataset.tag = '';
+  filterWrap.appendChild(allBtn);
+  allTags.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-tag';
+    btn.textContent = tag;
+    btn.dataset.tag = tag;
+    filterWrap.appendChild(btn);
+  });
 
-  // After overlay is gone, hide it
-  setTimeout(() => introEl.classList.add('done'), EXIT_MS);
+  filterWrap.addEventListener('click', e => {
+    const btn = e.target.closest('.filter-tag');
+    if (!btn) return;
+    filterWrap.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTag = btn.dataset.tag || null;
+    applyFilter();
+  });
 
-  // Stagger nodes in (pop up like constellations forming)
-  node.selectAll('circle')
-    .transition()
-    .delay((d, i) => 200 + i * 70)
-    .duration(500)
-    .ease(d3.easeBackOut.overshoot(1.4))
+  // ─── SVG ───────────────────────────────────────────────────────────────────
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+
+  const svg = d3.select('#graph-canvas').attr('width', W).attr('height', H);
+  const g = svg.append('g');
+
+  svg.call(
+    d3.zoom().scaleExtent([0.25, 5])
+      .on('zoom', e => g.attr('transform', e.transform))
+  );
+
+  // ─── PHOTO PATTERNS ────────────────────────────────────────────────────────
+  const defs = svg.append('defs');
+  photoNodes.forEach(d => {
+    const pat = defs.append('pattern')
+      .attr('id', `photo-${d.id}`)
+      .attr('patternUnits', 'objectBoundingBox')
+      .attr('width', 1)
+      .attr('height', 1);
+    pat.append('image')
+      .attr('href', d.src_url)
+      .attr('x', 0).attr('y', 0)
+      .attr('width', d.r * 2)
+      .attr('height', d.r * 2)
+      .attr('preserveAspectRatio', 'xMidYMid slice');
+  });
+
+  // ─── SIMULATION ────────────────────────────────────────────────────────────
+  const sim = d3.forceSimulation(photoNodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => 120 + (d.source.r + d.target.r) * 1.8).strength(0.25))
+    .force('charge', d3.forceManyBody().strength(d => -d.r * 32))
+    .force('center', d3.forceCenter(W / 2, H / 2).strength(0.04))
+    .force('collision', d3.forceCollide().radius(d => d.r + 24))
+    .alphaDecay(0.012)
+    .velocityDecay(0.4);
+
+  // ─── EDGES ─────────────────────────────────────────────────────────────────
+  const link = g.append('g').selectAll('line')
+    .data(links).join('line')
+    .attr('stroke', '#7A8B6F')
+    .attr('stroke-width', d => 0.6 + d.strength * 0.2)
+    .attr('opacity', d => 0.2 + d.strength * 0.1);
+
+  // ─── NODES ─────────────────────────────────────────────────────────────────
+  const node = g.append('g').selectAll('g')
+    .data(photoNodes).join('g')
+    .style('cursor', 'pointer')
+    .call(
+      d3.drag()
+        .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; })
+        .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+        .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+    );
+
+  // Background circle (fallback color while image loads)
+  node.append('circle')
     .attr('r', d => d.r)
+    .attr('fill', '#1E2A1A');
+
+  // Photo circle
+  node.append('circle')
+    .attr('r', d => d.r)
+    .attr('fill', d => `url(#photo-${d.id})`)
+    .attr('stroke', '#7A8B6F')
+    .attr('stroke-width', d => d.r > 20 ? 1.2 : 0.8)
     .attr('opacity', 1);
 
-  node.selectAll('text')
-    .transition()
-    .delay((d, i) => 400 + i * 70)
-    .duration(350)
-    .ease(d3.easeCubicOut)
-    .attr('opacity', 0.7);
+  // Labels
+  node.append('text')
+    .text(d => d.title)
+    .attr('y', d => d.r + 14)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', "'JetBrains Mono', monospace")
+    .attr('font-size', d => d.r > 20 ? 9 : 8)
+    .attr('fill', '#6A7B5F')
+    .attr('opacity', 0.7)
+    .attr('pointer-events', 'none');
 
-  // Edges draw in after nodes
-  link
-    .transition()
-    .delay((d, i) => 700 + i * 25)
-    .duration(600)
-    .ease(d3.easeCubicOut)
-    .attr('stroke-dashoffset', 0)
-    .attr('opacity', d => 0.2 + d.strength * 0.1)
-    .on('end', function() {
-      d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
-    });
+  // ─── FILTER ────────────────────────────────────────────────────────────────
+  function applyFilter() {
+    node.selectAll('circle')
+      .transition().duration(300)
+      .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 1 : 0.08);
+    node.selectAll('text')
+      .transition().duration(300)
+      .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 0.7 : 0.04);
+    link
+      .transition().duration(300)
+      .attr('opacity', d => {
+        if (!activeTag) return null;
+        return d.source.tags?.includes(activeTag) && d.target.tags?.includes(activeTag) ? 0.6 : 0.03;
+      });
+  }
 
-}, HOLD_MS);
+  // ─── HOVER / CLICK ─────────────────────────────────────────────────────────
+  const tooltip = document.getElementById('tooltip');
+  const tooltipLabel = document.getElementById('tooltip-label');
+  const tooltipTags = document.getElementById('tooltip-tags');
 
-window.addEventListener('resize', () => {
-  svg.attr('width', window.innerWidth).attr('height', window.innerHeight);
-  sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
-  sim.alpha(0.2).restart();
-});
+  node.on('mouseenter', (e, d) => {
+    node.selectAll('circle').attr('opacity', n => n.id === d.id ? 1 : 0.25);
+    link.attr('opacity', l => l.source.id === d.id || l.target.id === d.id ? 0.8 : 0.04);
+    d3.select(e.currentTarget).selectAll('circle')
+      .transition().duration(200).attr('r', d.r * 1.25).attr('opacity', 1);
+
+    tooltipLabel.textContent = d.title;
+    tooltipTags.innerHTML = (d.tags || []).map(t => `<span class="tooltip-tag">${t}</span>`).join('');
+    tooltip.classList.add('visible');
+  })
+  .on('mousemove', e => {
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top = (e.clientY - 8) + 'px';
+  })
+  .on('mouseleave', (e, d) => {
+    applyFilter();
+    d3.select(e.currentTarget).selectAll('circle')
+      .transition().duration(200).attr('r', d.r);
+    tooltip.classList.remove('visible');
+  })
+  .on('click', (e, d) => {
+    e.stopPropagation();
+    document.getElementById('modal-img').src = d.src_url;
+    document.getElementById('modal-label').textContent = d.title;
+    document.getElementById('modal-tags').innerHTML = (d.tags || []).map(t => `<span class="modal-tag">${t}</span>`).join('');
+    document.getElementById('modal').classList.add('visible');
+  });
+
+  svg.on('click', () => closeModal());
+
+  // ─── TICK ──────────────────────────────────────────────────────────────────
+  sim.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // ─── INTRO ANIMATION ───────────────────────────────────────────────────────
+  node.selectAll('circle').attr('r', 0).attr('opacity', 0);
+  node.selectAll('text').attr('opacity', 0);
+  link.attr('opacity', 0).attr('stroke-dasharray', function() {
+    const len = this.getTotalLength ? this.getTotalLength() : 80;
+    return `${len} ${len}`;
+  }).attr('stroke-dashoffset', function() {
+    const len = this.getTotalLength ? this.getTotalLength() : 80;
+    return len;
+  });
+
+  const HOLD_MS = 1500;
+  const EXIT_MS = 800;
+  const introEl = document.getElementById('intro-overlay');
+
+  setTimeout(() => {
+    introEl.classList.add('exiting');
+    setTimeout(() => introEl.classList.add('done'), EXIT_MS);
+
+    node.selectAll('circle')
+      .transition()
+      .delay((d, i) => 200 + i * 70)
+      .duration(500)
+      .ease(d3.easeBackOut.overshoot(1.4))
+      .attr('r', d => d.r)
+      .attr('opacity', 1);
+
+    node.selectAll('text')
+      .transition()
+      .delay((d, i) => 400 + i * 70)
+      .duration(350)
+      .ease(d3.easeCubicOut)
+      .attr('opacity', 0.7);
+
+    link
+      .transition()
+      .delay((d, i) => 700 + i * 25)
+      .duration(600)
+      .ease(d3.easeCubicOut)
+      .attr('stroke-dashoffset', 0)
+      .attr('opacity', d => 0.2 + d.strength * 0.1)
+      .on('end', function() {
+        d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+      });
+  }, HOLD_MS);
+
+  // ─── RESIZE ────────────────────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    svg.attr('width', window.innerWidth).attr('height', window.innerHeight);
+    sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+    sim.alpha(0.2).restart();
+  });
+}
+
+initGraph();
 </script>
 </body>
 </html>
