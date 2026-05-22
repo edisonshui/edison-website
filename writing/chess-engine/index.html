@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>building a chess engine that actually beats me — Edison</title>
+<meta name="description" content="Three weeks on minimax with alpha-beta pruning. Here's what I got wrong first.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-gray: #8A8070; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --clay: #B86A3E; --clay-dark: #7A4A28; --graph-bg: #0F0E0B;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--cream); color: var(--warm-black); font-family: var(--font-ui); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 64px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 100;
+    background: rgba(245,242,235,0.88); backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 0.5px solid rgba(214,209,196,0.6);
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: 0.08em; color: var(--warm-black); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-link { font-size: 12px; font-weight: 400; color: var(--warm-gray); letter-spacing: 0.02em; padding: 6px 0; position: relative; transition: color 200ms ease; }
+  .nav-link.active { color: var(--warm-black); font-weight: 500; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--clay); transform: scaleX(0); transform-origin: left; transition: transform 220ms ease; }
+  .nav-link:hover { color: var(--clay); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* POST HEADER */
+  .post-header { max-width: 720px; margin: 0 auto; padding: 148px 64px 64px; }
+  .back-link { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--stone); letter-spacing: 0.04em; margin-bottom: 40px; transition: color 150ms ease; }
+  .back-link:hover { color: var(--clay); }
+  .back-link::before { content: "←"; }
+
+  .post-tags { display: flex; gap: 6px; margin-bottom: 24px; }
+  .post-tag { font-size: 10px; color: var(--sage-dark); letter-spacing: 0.06em; background: var(--sage-light); padding: 3px 10px; border-radius: 2px; }
+
+  .post-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 60px); font-weight: 400; line-height: 1.05; letter-spacing: -0.01em; color: var(--warm-black); margin-bottom: 28px; }
+
+  .post-meta { display: flex; gap: 24px; align-items: center; padding-bottom: 48px; border-bottom: 0.5px solid var(--parchment); }
+  .post-date { font-family: var(--font-ui); font-size: 11px; font-weight: 500; color: var(--sage-dark); letter-spacing: 0.06em; text-transform: uppercase; }
+  .post-read-time { font-size: 11px; color: var(--stone); }
+
+  /* PROSE */
+  .post-body { max-width: 720px; margin: 0 auto; padding: 56px 64px 0; }
+  .prose { font-family: var(--font-body); font-size: 18.5px; line-height: 1.85; color: var(--warm-black); }
+  .prose p { margin-bottom: 28px; }
+  .prose p:last-child { margin-bottom: 0; }
+
+  /* Drop cap on first paragraph */
+  .prose p:first-of-type::first-letter {
+    font-family: var(--font-display); font-size: 5.2em; font-weight: 300;
+    float: left; line-height: 0.78; margin-right: 0.08em; margin-top: 0.06em;
+    color: var(--warm-black); letter-spacing: -0.01em;
+  }
+
+  .prose h2 { font-family: var(--font-display); font-size: 32px; font-weight: 400; color: var(--warm-black); margin: 56px 0 16px; line-height: 1.15; }
+  .prose h3 { font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--warm-black); letter-spacing: 0.04em; text-transform: uppercase; margin: 40px 0 12px; }
+
+  .prose code {
+    font-family: var(--font-mono); font-size: 14px; color: var(--sage-dark);
+    background: var(--paper); padding: 2px 7px; border-radius: 3px; border: 0.5px solid var(--parchment);
+  }
+  .prose pre {
+    background: var(--warm-black); border-radius: 8px; padding: 24px 28px; margin: 32px 0;
+    overflow-x: auto; border: 0.5px solid rgba(255,255,255,0.05);
+  }
+  .prose pre code { background: none; border: none; padding: 0; color: #C8D4B8; font-size: 13.5px; line-height: 1.8; }
+
+  .prose blockquote {
+    border-left: 2px solid var(--clay); padding: 4px 0 4px 24px; margin: 36px 0;
+    font-style: italic; color: var(--warm-gray);
+  }
+
+  .prose em { color: var(--warm-black); }
+
+  /* POST FOOTER */
+  .post-footer { max-width: 720px; margin: 0 auto; padding: 64px 64px 120px; }
+  .post-footer-divider { height: 0.5px; background: var(--parchment); margin-bottom: 48px; }
+  .related-label { font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); margin-bottom: 24px; }
+  .related-posts { display: flex; flex-direction: column; gap: 0; }
+  .related-post { padding: 20px 0; border-bottom: 0.5px solid var(--parchment); display: flex; gap: 20px; justify-content: space-between; align-items: baseline; }
+  .related-post:first-child { border-top: 0.5px solid var(--parchment); }
+  .related-post-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; color: var(--warm-black); transition: color 150ms ease; line-height: 1.2; }
+  .related-post:hover .related-post-title { color: var(--clay); }
+  .related-post-date { font-size: 11px; color: var(--stone); white-space: nowrap; }
+
+  .footer { border-top: 0.5px solid var(--parchment); background: var(--cream); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 56px 64px 48px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+  .footer-brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.08em; color: var(--warm-black); margin-bottom: 8px; }
+  .footer-meta { font-size: 11px; font-style: italic; color: var(--stone); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-link { font-size: 12px; color: var(--warm-gray); transition: color 120ms ease; }
+  .footer-link:hover { color: var(--clay); }
+
+  @media (max-width: 900px) {
+    .nav { padding: 0 24px; }
+    .post-header, .post-body, .post-footer { padding-left: 24px; padding-right: 24px; }
+    .prose { font-size: 17px; }
+    .footer-inner { padding: 48px 24px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">EDISON</a>
+  <div class="nav-links">
+    <a href="/writing" class="nav-link active">writing</a>
+    <a href="/projects" class="nav-link">projects</a>
+    <a href="/playground" class="nav-link">playground</a>
+    <a href="/graph" class="nav-link">graph</a>
+    <a href="/about" class="nav-link">about</a>
+  </div>
+</nav>
+
+<div class="post-header">
+  <a href="/writing" class="back-link">writing</a>
+  <div class="post-tags">
+    <span class="post-tag">chess</span>
+    <span class="post-tag">algorithms</span>
+  </div>
+  <h1 class="post-title">building a chess engine that actually beats me</h1>
+  <div class="post-meta">
+    <span class="post-date">May 12, 2025</span>
+    <span class="post-read-time">8 min read</span>
+  </div>
+</div>
+
+<div class="post-body">
+  <div class="prose">
+
+    <p>I kept wondering why my chess AI would blunder obvious pieces. Turns out it was evaluating 8 million nodes a second and still playing like my little cousin. The problem wasn't search depth — the problem was that I'd written my evaluation function during a 2 AM session and it thought a passed pawn in the center was worth about as much as the queen.</p>
+
+    <p>This is the story of three weeks, one algorithm, and the slow realization that "minimax" is a five-minute explanation and a three-week implementation.</p>
+
+    <h2>The algorithm, the way I wish someone had explained it</h2>
+
+    <p>Minimax is simple in theory: you're trying to maximize your score, your opponent is trying to minimize it. At every move, you pick the best outcome assuming your opponent also plays perfectly. Recursively. Down to some depth.</p>
+
+    <p>The version in every textbook makes it look obvious. Here's what they leave out: at depth 5, a standard chess position has about 69 billion nodes. You can't evaluate all of them. You need pruning.</p>
+
+    <h3>Alpha-beta pruning</h3>
+
+    <p>Alpha-beta is an optimization that cuts branches of the game tree you can prove will never be reached. If you've already found a move that guarantees a score of +2, and you're evaluating a branch that can only give your opponent at most +1, you stop — there's no reason to go deeper.</p>
+
+    <p>In the best case, alpha-beta halves the effective depth. In practice, with good move ordering, you can get close to that ceiling.</p>
+
+    <pre><code>function minimax(board, depth, alpha, beta, maximizing) {
+  if (depth === 0) return evaluate(board);
+
+  const moves = board.getLegalMoves();
+  if (maximizing) {
+    let best = -Infinity;
+    for (const move of moves) {
+      board.makeMove(move);
+      const score = minimax(board, depth - 1, alpha, beta, false);
+      board.undoMove(move);
+      best = Math.max(best, score);
+      alpha = Math.max(alpha, best);
+      if (beta <= alpha) break; // prune
+    }
+    return best;
+  } else {
+    // symmetric for minimizing player
+  }
+}</code></pre>
+
+    <p>The first version I wrote had a bug: I was passing <code>alpha</code> and <code>beta</code> by value, not by reference, so the pruning never actually activated. The engine was running full minimax at depth 5 and taking 8 seconds per move. My friend thought it was "thinking really hard."</p>
+
+    <h2>What the evaluation function actually does</h2>
+
+    <p>The evaluation function is where I lost the most time. My first version was: count the material, assign piece values (pawn=1, knight=3, bishop=3, rook=5, queen=9), return the difference.</p>
+
+    <blockquote>A passed pawn on e5 is not the same as a passed pawn on a2. An open file means nothing if you have no rooks. I knew this. My engine did not.</blockquote>
+
+    <p>The fix was piece-square tables — lookup tables that give each piece a positional bonus depending on where it sits on the board. Knights are worth more in the center. Rooks want open files. Kings want to hide in the corner until the endgame, then centralize. Once I added these, the engine started making moves that at least looked intentional.</p>
+
+    <h2>The Web Worker problem</h2>
+
+    <p>The browser froze every time the AI was thinking. Obviously. Running a recursive search on the main thread blocks the UI. I needed to offload the search to a Web Worker.</p>
+
+    <p>The tricky part was serializing the board state. My <code>Board</code> class had methods — you can't pass class instances through <code>postMessage</code> with their prototypes intact. I ended up converting everything to a plain object representation (a flat array of piece codes) and deserializing on the worker side. Not elegant, but it works.</p>
+
+    <p>The bigger win: now you can watch the AI "thinking" while the board stays responsive. A small progress indicator and the elapsed time display. It changed how the game felt — suddenly it had weight.</p>
+
+    <h2>Where I am now</h2>
+
+    <p>The engine handles all legal moves, castling, en passant, promotion, and threefold repetition detection. At depth 5 with alpha-beta and a small opening book, it plays around 1300 Elo — which is slightly above my actual rating, which is humbling in a very specific way.</p>
+
+    <p>Next: quiescence search (keep searching until the position is "quiet"), then iterative deepening so the engine can always return a best move if it runs out of time.</p>
+
+    <p>If you want to play against it, it's on the <a href="/playground" style="color:var(--clay); border-bottom: 0.5px solid var(--clay); padding-bottom: 1px;">playground</a>. It'll beat you on hard. I'm sorry in advance.</p>
+
+  </div>
+</div>
+
+<div class="post-footer">
+  <div class="post-footer-divider"></div>
+  <p class="related-label">More posts</p>
+  <div class="related-posts">
+    <a href="#" class="related-post">
+      <span class="related-post-title">what chess taught me about debugging</span>
+      <span class="related-post-date">Dec 08, 2024</span>
+    </a>
+    <a href="#" class="related-post">
+      <span class="related-post-title">three weeks in, my recursion finally stopped lying to me</span>
+      <span class="related-post-date">Mar 18, 2025</span>
+    </a>
+    <a href="#" class="related-post">
+      <span class="related-post-title">the first time I deployed something real and immediately had to fix it</span>
+      <span class="related-post-date">Jan 14, 2025</span>
+    </a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">EDISON</div><div class="footer-meta">© 2026 · still tinkering</div></div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">github</a>
+      <a href="#" class="footer-link">email</a>
+      <a href="#" class="footer-link">resume</a>
+      <a href="#" class="footer-link">rss</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

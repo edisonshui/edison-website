@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Edison</title>
+<meta name="description" content="CS student. I write about what I'm building, what I'm learning, and occasionally about chess.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-gray: #8A8070; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --clay: #B86A3E; --clay-dark: #7A4A28; --graph-bg: #0F0E0B;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--cream); color: var(--warm-black); font-family: var(--font-ui); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 64px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 100;
+    background: rgba(245,242,235,0.88); backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 0.5px solid rgba(214,209,196,0.6);
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: 0.08em; color: var(--warm-black); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-link { font-size: 12px; font-weight: 400; color: var(--warm-gray); letter-spacing: 0.02em; padding: 6px 0; position: relative; transition: color 200ms ease; }
+  .nav-link.active { color: var(--warm-black); font-weight: 500; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--clay); transform: scaleX(0); transform-origin: left; transition: transform 220ms ease; }
+  .nav-link:hover { color: var(--clay); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* MAIN LAYOUT */
+  .about-wrap { max-width: 1100px; margin: 0 auto; padding: 152px 64px 120px; }
+  .about-grid { display: grid; grid-template-columns: 1fr 400px; gap: 96px; align-items: start; }
+
+  /* LEFT COL */
+  .eyebrow { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 20px; }
+  .eyebrow-num { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--clay); margin-right: 12px; vertical-align: -1px; }
+  .about-name { font-family: var(--font-display); font-size: clamp(48px, 6vw, 80px); font-weight: 300; letter-spacing: -0.01em; line-height: 0.95; color: var(--warm-black); margin-bottom: 36px; }
+
+  .bio { font-family: var(--font-body); font-size: 18px; line-height: 1.85; color: var(--warm-black); max-width: 560px; }
+  .bio p { margin-bottom: 20px; }
+  .bio p:last-child { margin-bottom: 0; }
+
+  .divider { height: 0.5px; background: var(--parchment); margin: 48px 0; }
+
+  /* CURRENTLY */
+  .currently-label { font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); margin-bottom: 20px; }
+  .currently-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .currently-item {
+    display: flex; gap: 16px; align-items: baseline;
+    padding: 14px 0; border-bottom: 0.5px solid var(--parchment);
+    font-size: 14px; color: var(--warm-gray); line-height: 1.6;
+  }
+  .currently-item:first-child { border-top: 0.5px solid var(--parchment); }
+  .currently-key { font-family: var(--font-mono); font-size: 10px; color: var(--stone); min-width: 80px; flex-shrink: 0; padding-top: 2px; }
+
+  /* LINKS */
+  .links-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 48px; }
+  .about-link {
+    font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+    letter-spacing: 0.04em; padding: 9px 20px; border-radius: 2px;
+    border: 0.5px solid var(--parchment); background: var(--paper);
+    color: var(--warm-black); transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+  .about-link:hover { background: var(--warm-black); color: var(--cream); border-color: var(--warm-black); }
+  .about-link:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+
+  /* RIGHT COL — PHOTO */
+  .photo-frame {
+    position: sticky; top: 104px;
+    border-radius: 12px; overflow: hidden;
+    border: 0.5px solid var(--parchment);
+    aspect-ratio: 3/4;
+    background: var(--paper);
+  }
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; background: var(--paper);
+  }
+  .photo-placeholder-label { font-family: var(--font-mono); font-size: 10px; color: var(--stone); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .footer { border-top: 0.5px solid var(--parchment); background: var(--cream); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 56px 64px 48px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+  .footer-brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.08em; color: var(--warm-black); margin-bottom: 8px; }
+  .footer-meta { font-size: 11px; font-style: italic; color: var(--stone); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-link { font-size: 12px; color: var(--warm-gray); transition: color 120ms ease; }
+  .footer-link:hover { color: var(--clay); }
+
+  /* PAGE ENTRANCE */
+  .pe-bar{position:fixed;top:0;left:0;right:0;height:1.5px;background:var(--clay);transform-origin:left;z-index:9999;pointer-events:none;animation:pe-bar 700ms cubic-bezier(.4,0,.2,1) both}
+  @keyframes pe-bar{0%{transform:scaleX(0);opacity:1}80%{transform:scaleX(1);opacity:1}to{transform:scaleX(1);opacity:0}}
+  .pe-nav{animation:pe-dn 500ms cubic-bezier(.22,1,.36,1) both}
+  .pe-up{animation:pe-up 650ms cubic-bezier(.22,1,.36,1) var(--d,0ms) both}
+  .pe-rt{animation:pe-rt 700ms cubic-bezier(.22,1,.36,1) var(--d,0ms) both}
+  @keyframes pe-dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes pe-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes pe-rt{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+
+  @media (max-width: 900px) {
+    .nav { padding: 0 24px; }
+    .about-wrap { padding: 120px 24px 80px; }
+    .about-grid { grid-template-columns: 1fr; gap: 56px; }
+    .photo-frame { position: static; max-width: 320px; aspect-ratio: 1; }
+    .footer-inner { padding: 48px 24px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="pe-bar"></div>
+
+<nav class="nav pe-nav">
+  <a href="/" class="nav-brand">EDISON</a>
+  <div class="nav-links">
+    <a href="/writing" class="nav-link">writing</a>
+    <a href="/projects" class="nav-link">projects</a>
+    <a href="/playground" class="nav-link">playground</a>
+    <a href="/graph" class="nav-link">graph</a>
+    <a href="/about" class="nav-link active">about</a>
+  </div>
+</nav>
+
+<div class="about-wrap">
+  <div class="about-grid">
+
+    <div class="about-left">
+      <p class="eyebrow pe-up" style="--d:0ms"><span class="eyebrow-num">06</span>about</p>
+      <h1 class="about-name pe-up" style="--d:90ms">Edison<br>Hui</h1>
+
+      <div class="bio pe-up" style="--d:220ms">
+        <p>I'm a CS student at the University of Washington, class of '26. I've built a chess engine that beats me, websites for restaurants in my neighborhood, and a handful of tools I use every day.</p>
+        <p>I write about what I'm building, what I'm learning, and occasionally about chess. I try to be specific rather than impressive — the interesting part is usually what went wrong first.</p>
+        <p>Before UW I was at The Overlake School. I grew up in New York. I play chess badly but with conviction.</p>
+      </div>
+
+      <div class="divider pe-up" style="--d:420ms"></div>
+
+      <p class="currently-label pe-up" style="--d:530ms">Currently</p>
+      <ul class="currently-list">
+        <li class="currently-item">
+          <span class="currently-key">building</span>
+          <span>the photo graph — an interactive D3 force simulation where nodes are photos and edges form where tags overlap</span>
+        </li>
+        <li class="currently-item">
+          <span class="currently-key">reading</span>
+          <span><em>SICP</em> for the second time, much more slowly than the first</span>
+        </li>
+        <li class="currently-item">
+          <span class="currently-key">playing</span>
+          <span>chess — rated 1420 on Lichess, aiming for 1600 before the end of the year</span>
+        </li>
+        <li class="currently-item">
+          <span class="currently-key">listening</span>
+          <span>Floating Points, Four Tet, anything with a long fade-out</span>
+        </li>
+        <li class="currently-item">
+          <span class="currently-key">location</span>
+          <span>Seattle, WA — previously New York</span>
+        </li>
+      </ul>
+
+      <div class="links-row pe-up" style="--d:820ms">
+        <a href="#" class="about-link">github</a>
+        <a href="#" class="about-link">resume</a>
+        <a href="mailto:toedisonhui@gmail.com" class="about-link">email</a>
+        <a href="#" class="about-link">linkedin</a>
+      </div>
+    </div>
+
+    <div class="about-right">
+      <div class="photo-frame pe-rt" style="--d:200ms">
+        <img src="/Assets/Gemini_Generated_Image_d6xdhgd6xdhgd6xd.png" alt="Edison"
+          onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><span class=\'photo-placeholder-label\'>photo coming soon</span></div>'">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">EDISON</div><div class="footer-meta">© 2026 · still tinkering</div></div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">github</a>
+      <a href="mailto:toedisonhui@gmail.com" class="footer-link">email</a>
+      <a href="#" class="footer-link">resume</a>
+      <a href="#" class="footer-link">rss</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.currently-item').forEach((el, i) => {
+    el.classList.add('pe-up');
+    el.style.setProperty('--d', (620 + i * 45) + 'ms');
+  });
+</script>
+</body>
+</html>

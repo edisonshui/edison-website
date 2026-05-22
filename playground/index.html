@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playground — Edison</title>
+<meta name="description" content="Live demos, interactive experiments, and a sandbox.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-gray: #8A8070; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --clay: #B86A3E; --clay-dark: #7A4A28; --graph-bg: #0F0E0B;
+    --editor-bg: #1A1914; --editor-gutter: #141210; --editor-border: #2E2C24;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--cream); color: var(--warm-black); font-family: var(--font-ui); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 64px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 100;
+    background: rgba(245,242,235,0.88); backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 0.5px solid rgba(214,209,196,0.6);
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: 0.08em; color: var(--warm-black); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-link { font-size: 12px; font-weight: 400; color: var(--warm-gray); letter-spacing: 0.02em; padding: 6px 0; position: relative; transition: color 200ms ease; }
+  .nav-link.active { color: var(--warm-black); font-weight: 500; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--clay); transform: scaleX(0); transform-origin: left; transition: transform 220ms ease; }
+  .nav-link:hover { color: var(--clay); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  .page-header { padding: 152px 64px 64px; max-width: 1100px; margin: 0 auto; }
+  .eyebrow { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 20px; }
+  .eyebrow-num { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--clay); margin-right: 12px; vertical-align: -1px; }
+  .page-title { font-family: var(--font-display); font-size: clamp(44px, 5.5vw, 72px); font-weight: 300; letter-spacing: -0.01em; line-height: 1; color: var(--warm-black); margin-bottom: 20px; max-width: 680px; }
+  .page-desc { font-size: 14px; color: var(--warm-gray); line-height: 1.75; max-width: 420px; }
+
+  /* FILTER */
+  .filter-row { max-width: 1100px; margin: 0 auto; padding: 0 64px 56px; border-bottom: 0.5px solid var(--parchment); display: flex; gap: 8px; }
+  .filter-pill { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: lowercase; padding: 7px 16px; border-radius: 2px; cursor: pointer; border: 0.5px solid var(--parchment); background: var(--paper); color: var(--warm-gray); transition: background 120ms ease, color 120ms ease, border-color 120ms ease; user-select: none; }
+  .filter-pill.active { background: var(--sage-light); color: var(--sage-dark); border-color: transparent; }
+  .filter-pill:hover:not(.active) { background: var(--parchment); color: var(--warm-black); }
+
+  /* DEMO CARDS */
+  .demos-section { max-width: 1100px; margin: 0 auto; padding: 48px 64px 0; }
+  .demo-card { border: 0.5px solid var(--parchment); border-radius: 12px; overflow: hidden; margin-bottom: 12px; transition: border-color 200ms ease; }
+  .demo-card:hover { border-color: var(--stone); }
+  .demo-card.hidden { display: none; }
+
+  .demo-header {
+    padding: 24px 28px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+    cursor: pointer; background: var(--paper); transition: background 150ms ease; user-select: none;
+  }
+  .demo-header:hover { background: #E5E1D6; }
+  .demo-header-left { flex: 1; }
+  .demo-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .demo-title { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--warm-black); line-height: 1.2; }
+  .demo-badge { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 2px; }
+  .badge-live { background: var(--sage-light); color: var(--sage-dark); }
+  .badge-experiment { background: var(--paper); color: var(--warm-gray); border: 0.5px solid var(--parchment); }
+  .badge-wip { background: var(--parchment); color: var(--stone); }
+  .demo-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.65; margin-bottom: 12px; max-width: 560px; }
+  .demo-stack { display: flex; gap: 6px; flex-wrap: wrap; }
+  .stack-tag { font-family: var(--font-mono); font-size: 10px; color: var(--sage-dark); background: var(--sage-light); padding: 3px 9px; border-radius: 2px; }
+  .demo-toggle { font-size: 11px; font-weight: 500; color: var(--warm-gray); background: var(--cream); border: 0.5px solid var(--parchment); padding: 8px 18px; border-radius: 2px; cursor: pointer; white-space: nowrap; transition: background 150ms ease, color 150ms ease; flex-shrink: 0; align-self: flex-start; }
+  .demo-toggle:hover { background: var(--warm-black); color: var(--cream); border-color: var(--warm-black); }
+  .demo-card.open .demo-toggle { color: var(--stone); }
+
+  .demo-body { background: var(--cream); border-top: 0.5px solid var(--parchment); padding: 24px 28px; display: none; }
+  .demo-card.open .demo-body { display: block; }
+  .demo-embed { background: var(--paper); border: 0.5px solid var(--parchment); border-radius: 8px; height: 320px; display: flex; align-items: center; justify-content: center; }
+  .demo-embed-label { font-family: var(--font-mono); font-size: 11px; color: var(--stone); letter-spacing: 0.1em; }
+
+  /* Chess board demo */
+  .chess-board { display: grid; grid-template-columns: repeat(8, 1fr); width: 256px; height: 256px; border: 1px solid var(--parchment); border-radius: 4px; overflow: hidden; }
+  .chess-sq { display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .chess-sq.light { background: var(--cream); }
+  .chess-sq.dark { background: var(--stone); }
+
+  /* SANDBOX */
+  .sandbox-section { max-width: 1100px; margin: 0 auto; padding: 64px 64px 120px; }
+  .sandbox-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .sandbox-eyebrow { font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); }
+  .sandbox-title { font-family: var(--font-display); font-size: 28px; font-weight: 400; color: var(--warm-black); margin-bottom: 8px; }
+  .sandbox-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.65; margin-bottom: 24px; max-width: 440px; }
+
+  .sandbox-shell { background: var(--editor-bg); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--editor-border); }
+  .sandbox-tabs { background: #141210; display: flex; align-items: center; padding: 0 4px; border-bottom: 0.5px solid var(--editor-border); }
+  .sandbox-tab { font-family: var(--font-mono); font-size: 11px; color: #5A5A4A; padding: 10px 16px; cursor: pointer; border-bottom: 1.5px solid transparent; transition: color 150ms ease, border-color 150ms ease; user-select: none; }
+  .sandbox-tab.active { color: #EAE6DC; border-bottom-color: var(--sage); }
+  .sandbox-tab:hover:not(.active) { color: #8A8A7A; }
+  .sandbox-meta { margin-left: auto; font-family: var(--font-mono); font-size: 9px; color: #3A3A2A; padding-right: 8px; }
+
+  .sandbox-panes { display: grid; grid-template-columns: 1fr 1fr; }
+  .sandbox-editor-wrap { border-right: 0.5px solid var(--editor-border); min-height: 260px; }
+  .sandbox-preview { padding: 16px; display: flex; align-items: flex-start; }
+  .sandbox-preview iframe { width: 100%; height: 240px; border: none; border-radius: 4px; background: var(--cream); }
+  .sandbox-hint { font-family: var(--font-mono); font-size: 9px; color: #3A3A2A; padding: 8px 16px; border-top: 0.5px solid var(--editor-border); text-align: center; }
+
+  /* CodeMirror overrides */
+  .CodeMirror { background: var(--editor-bg) !important; color: #C8D4B8 !important; font-family: var(--font-mono) !important; font-size: 13px !important; line-height: 1.8 !important; height: 240px !important; }
+  .CodeMirror-gutters { background: var(--editor-gutter) !important; border-right: 0.5px solid var(--editor-border) !important; }
+  .CodeMirror-gutter-elt { color: #3A3A2A !important; }
+  .CodeMirror-cursor { border-left-color: var(--sage) !important; }
+  .CodeMirror-selected { background: #2A3822 !important; }
+  .cm-tag { color: #7A9A6A !important; }
+  .cm-attribute { color: #A8C080 !important; }
+  .cm-string { color: #B8C898 !important; }
+  .cm-keyword { color: #8AB080 !important; }
+  .cm-def { color: #C8D4B8 !important; }
+  .cm-comment { color: #4A5A3A !important; font-style: italic !important; }
+
+  .footer { border-top: 0.5px solid var(--parchment); background: var(--cream); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 56px 64px 48px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+  .footer-brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.08em; color: var(--warm-black); margin-bottom: 8px; }
+  .footer-meta { font-size: 11px; font-style: italic; color: var(--stone); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-link { font-size: 12px; color: var(--warm-gray); transition: color 120ms ease; }
+  .footer-link:hover { color: var(--clay); }
+
+  /* PAGE ENTRANCE */
+  .pe-bar{position:fixed;top:0;left:0;right:0;height:1.5px;background:var(--clay);transform-origin:left;z-index:9999;pointer-events:none;animation:pe-bar 700ms cubic-bezier(.4,0,.2,1) both}
+  @keyframes pe-bar{0%{transform:scaleX(0);opacity:1}80%{transform:scaleX(1);opacity:1}to{transform:scaleX(1);opacity:0}}
+  .pe-nav{animation:pe-dn 500ms cubic-bezier(.22,1,.36,1) both}
+  .pe-up{animation:pe-up 650ms cubic-bezier(.22,1,.36,1) var(--d,0ms) both}
+  @keyframes pe-dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes pe-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  @media (max-width: 900px) {
+    .nav { padding: 0 24px; }
+    .page-header { padding: 120px 24px 56px; }
+    .filter-row { padding: 0 24px 48px; }
+    .demos-section { padding: 48px 24px 0; }
+    .sandbox-section { padding: 64px 24px 80px; }
+    .sandbox-panes { grid-template-columns: 1fr; }
+    .sandbox-editor-wrap { border-right: none; border-bottom: 0.5px solid var(--editor-border); }
+    .footer-inner { padding: 48px 24px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="pe-bar"></div>
+
+<nav class="nav pe-nav">
+  <a href="/" class="nav-brand">EDISON</a>
+  <div class="nav-links">
+    <a href="/writing" class="nav-link">writing</a>
+    <a href="/projects" class="nav-link">projects</a>
+    <a href="/playground" class="nav-link active">playground</a>
+    <a href="/graph" class="nav-link">graph</a>
+    <a href="/about" class="nav-link">about</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p class="eyebrow pe-up" style="--d:0ms"><span class="eyebrow-num">04</span>playground</p>
+  <h1 class="page-title pe-up" style="--d:90ms">Things you can<br>actually use.</h1>
+  <p class="page-desc pe-up" style="--d:170ms">Live demos and interactive experiments. If you can't use it on the page, it doesn't belong here.</p>
+</div>
+
+<div class="filter-row pe-up" style="--d:260ms">
+  <button class="filter-pill active" data-filter="all">all</button>
+  <button class="filter-pill" data-filter="live">live</button>
+  <button class="filter-pill" data-filter="experiment">experiment</button>
+  <button class="filter-pill" data-filter="wip">wip</button>
+</div>
+
+<div class="demos-section">
+
+  <div class="demo-card" data-status="live">
+    <div class="demo-header" onclick="toggleDemo(this)">
+      <div class="demo-header-left">
+        <div class="demo-title-row">
+          <span class="demo-title">Chess Engine</span>
+          <span class="demo-badge badge-live">live</span>
+        </div>
+        <p class="demo-desc">Minimax AI with alpha-beta pruning and an opening book. Three difficulty levels. It will beat you on hard — I wrote about how it works <a href="/writing/chess-engine" style="color:var(--clay); border-bottom:0.5px solid var(--clay);" onclick="event.stopPropagation()">here</a>.</p>
+        <div class="demo-stack">
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">Web Workers</span>
+          <span class="stack-tag">HTML/CSS</span>
+        </div>
+      </div>
+      <button class="demo-toggle">open ↓</button>
+    </div>
+    <div class="demo-body">
+      <div class="demo-embed">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div class="chess-board" id="board"></div>
+          <p style="font-size:11px;color:var(--stone);font-family:var(--font-mono);">click a piece to move · engine plays black</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-card" data-status="live">
+    <div class="demo-header" onclick="toggleDemo(this)">
+      <div class="demo-header-left">
+        <div class="demo-title-row">
+          <span class="demo-title">Restaurant Sites</span>
+          <span class="demo-badge badge-live">live</span>
+        </div>
+        <p class="demo-desc">Websites for three restaurants in my neighborhood. Scroll and click inside — they're fully live. Built with Next.js and Sanity CMS.</p>
+        <div class="demo-stack">
+          <span class="stack-tag">Next.js</span>
+          <span class="stack-tag">Sanity</span>
+          <span class="stack-tag">Vercel</span>
+        </div>
+      </div>
+      <button class="demo-toggle">open ↓</button>
+    </div>
+    <div class="demo-body">
+      <div class="demo-embed" style="height:360px;flex-direction:column;gap:8px;padding:16px;">
+        <p style="font-size:11px;color:var(--stone);font-family:var(--font-mono);letter-spacing:0.08em;margin-bottom:8px;">RESTAURANT PREVIEWS</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;">
+          <div style="background:var(--parchment);border-radius:6px;height:200px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--stone);font-family:var(--font-mono);">site 01</div>
+          <div style="background:var(--parchment);border-radius:6px;height:200px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--stone);font-family:var(--font-mono);">site 02</div>
+          <div style="background:var(--parchment);border-radius:6px;height:200px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--stone);font-family:var(--font-mono);">site 03</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-card" data-status="experiment">
+    <div class="demo-header" onclick="toggleDemo(this)">
+      <div class="demo-header-left">
+        <div class="demo-title-row">
+          <span class="demo-title">Claude Vision Tool</span>
+          <span class="demo-badge badge-experiment">experiment</span>
+        </div>
+        <p class="demo-desc">Upload a screenshot or UI mockup, ask a question, get a specific answer from Claude's vision API. Built for my own design workflow.</p>
+        <div class="demo-stack">
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">Anthropic API</span>
+          <span class="stack-tag">Flask</span>
+        </div>
+      </div>
+      <button class="demo-toggle">open ↓</button>
+    </div>
+    <div class="demo-body">
+      <div class="demo-embed" style="flex-direction:column;gap:12px;padding:24px;">
+        <div style="width:100%;max-width:400px;background:var(--paper);border:0.5px solid var(--parchment);border-radius:8px;padding:20px;">
+          <p style="font-size:12px;color:var(--warm-black);font-weight:500;margin-bottom:8px;">Upload an image</p>
+          <div style="border:1px dashed var(--parchment);border-radius:4px;padding:24px;text-align:center;margin-bottom:12px;">
+            <p style="font-size:11px;color:var(--stone);">drag & drop or click to upload</p>
+          </div>
+          <p style="font-size:12px;color:var(--warm-black);font-weight:500;margin-bottom:8px;">Ask a question</p>
+          <div style="background:var(--cream);border:0.5px solid var(--parchment);border-radius:4px;padding:10px 12px;font-size:12px;color:var(--stone);">What's wrong with this layout?</div>
+        </div>
+        <p style="font-size:11px;color:var(--stone);font-family:var(--font-mono);">live API calls — requires auth token</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-card" data-status="wip">
+    <div class="demo-header" onclick="toggleDemo(this)">
+      <div class="demo-header-left">
+        <div class="demo-title-row">
+          <span class="demo-title">Recursion Visualizer</span>
+          <span class="demo-badge badge-wip">wip</span>
+        </div>
+        <p class="demo-desc">Animated step-through of recursive function calls. Watch the call stack build and unwind. Useful for the exact moment recursion stops feeling like magic.</p>
+        <div class="demo-stack">
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">Canvas API</span>
+        </div>
+      </div>
+      <button class="demo-toggle">open ↓</button>
+    </div>
+    <div class="demo-body">
+      <div class="demo-embed">
+        <span class="demo-embed-label">coming soon — still polishing</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SANDBOX -->
+<div class="sandbox-section">
+  <p class="sandbox-eyebrow">sandbox</p>
+  <h2 class="sandbox-title">Live code editor.</h2>
+  <p class="sandbox-desc">Paste any HTML/CSS/JS and run it right here. Pre-loaded with whatever I'm currently tinkering on.</p>
+
+  <div class="sandbox-shell">
+    <div class="sandbox-tabs">
+      <div class="sandbox-tab active" data-lang="html" onclick="switchTab(this)">HTML</div>
+      <div class="sandbox-tab" data-lang="css" onclick="switchTab(this)">CSS</div>
+      <div class="sandbox-tab" data-lang="js" onclick="switchTab(this)">JS</div>
+      <span class="sandbox-meta">sandbox · current experiment</span>
+    </div>
+    <div class="sandbox-panes">
+      <div class="sandbox-editor-wrap">
+        <textarea id="sandbox-editor"></textarea>
+      </div>
+      <div class="sandbox-preview">
+        <iframe id="sandbox-preview" sandbox="allow-scripts"></iframe>
+      </div>
+    </div>
+    <div class="sandbox-hint">editor left · live preview right · updates as you type</div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">EDISON</div><div class="footer-meta">© 2026 · still tinkering</div></div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">github</a>
+      <a href="#" class="footer-link">email</a>
+      <a href="#" class="footer-link">resume</a>
+      <a href="#" class="footer-link">rss</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script>
+  // Stagger demo cards
+  document.querySelectorAll('.demo-card').forEach((el, i) => {
+    el.classList.add('pe-up');
+    el.style.setProperty('--d', (350 + i * 70) + 'ms');
+  });
+  // Sandbox slides up last
+  const sb = document.querySelector('.sandbox-section');
+  if (sb) { sb.classList.add('pe-up'); sb.style.setProperty('--d', '640ms'); }
+
+  // Demo card toggle
+  function toggleDemo(header) {
+    const card = header.closest('.demo-card');
+    const btn = header.querySelector('.demo-toggle');
+    const isOpen = card.classList.toggle('open');
+    btn.textContent = isOpen ? 'close ↑' : 'open ↓';
+  }
+
+  // Filter
+  const pills = document.querySelectorAll('.filter-pill');
+  const cards = document.querySelectorAll('.demo-card');
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const f = pill.dataset.filter;
+      cards.forEach(card => card.classList.toggle('hidden', f !== 'all' && card.dataset.status !== f));
+    });
+  });
+
+  // Chess board render (visual only)
+  const pieces = {
+    r: '♜', n: '♞', b: '♝', q: '♛', k: '♚', p: '♟',
+    R: '♖', N: '♘', B: '♗', Q: '♕', K: '♔', P: '♙'
+  };
+  const startPos = [
+    ['r','n','b','q','k','b','n','r'],
+    ['p','p','p','p','p','p','p','p'],
+    [' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' '],
+    ['P','P','P','P','P','P','P','P'],
+    ['R','N','B','Q','K','B','N','R'],
+  ];
+  const board = document.getElementById('board');
+  if (board) {
+    startPos.forEach((row, r) => {
+      row.forEach((p, c) => {
+        const sq = document.createElement('div');
+        sq.className = 'chess-sq ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+        sq.textContent = p !== ' ' ? pieces[p] : '';
+        sq.style.color = p === p.toUpperCase() && p !== ' ' ? '#1C1A14' : '#F5F2EB';
+        board.appendChild(sq);
+      });
+    });
+  }
+
+  // Sandbox
+  const sandboxCode = {
+    html: `<div class="card">\n  <h2>Hello</h2>\n  <p>Edit me and watch the preview update.</p>\n  <button onclick="this.textContent='clicked!'">click me</button>\n</div>`,
+    css: `body { background: #F5F2EB; font-family: system-ui; padding: 20px; }\n.card { background: #EAE6DC; border-radius: 8px; padding: 24px; max-width: 300px; }\nh2 { font-family: Georgia; font-weight: 300; margin-bottom: 10px; color: #1C1A14; }\np { font-size: 14px; color: #8A8070; }\nbutton { margin-top: 12px; padding: 8px 16px; background: #1C1A14; color: #F5F2EB; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; }`,
+    js: `// your JS here\nconsole.log('sandbox ready');`
+  };
+  let currentLang = 'html';
+
+  const editor = CodeMirror.fromTextArea(document.getElementById('sandbox-editor'), {
+    mode: 'htmlmixed', lineNumbers: true, lineWrapping: false,
+    tabSize: 2, indentWithTabs: false,
+  });
+  editor.setValue(sandboxCode.html);
+
+  function updatePreview() {
+    sandboxCode[currentLang] = editor.getValue();
+    const html = `<!DOCTYPE html><html><head><style>${sandboxCode.css}</style></head><body>${sandboxCode.html}<script>${sandboxCode.js}<\/script></body></html>`;
+    const preview = document.getElementById('sandbox-preview');
+    preview.srcdoc = html;
+  }
+
+  editor.on('change', updatePreview);
+  updatePreview();
+
+  function switchTab(tab) {
+    sandboxCode[currentLang] = editor.getValue();
+    document.querySelectorAll('.sandbox-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentLang = tab.dataset.lang;
+    const modeMap = { html: 'htmlmixed', css: 'css', js: 'javascript' };
+    editor.setOption('mode', modeMap[currentLang]);
+    editor.setValue(sandboxCode[currentLang]);
+  }
+</script>
+</body>
+</html>

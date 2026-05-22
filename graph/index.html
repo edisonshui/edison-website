@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph — Edison</title>
+<meta name="description" content="My life, as a network.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --graph-bg: #0F0E0B; --graph-surface: #141410; --graph-border: #2A2A20;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: var(--graph-bg); color: var(--cream); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+
+  /* NAV — dark variant */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px; padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 200;
+    background: transparent;
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 18px; font-weight: 400; letter-spacing: 0.08em; color: var(--paper); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-link { font-size: 11px; color: #4A4A3A; letter-spacing: 0.02em; padding: 4px 0; transition: color 200ms ease; }
+  .nav-link.active { color: var(--sage); }
+  .nav-link:hover { color: #6A6A5A; }
+
+  /* FULL CANVAS */
+  #graph-canvas { position: fixed; inset: 0; }
+
+  /* INTRO OVERLAY */
+  #intro-overlay {
+    position: fixed; inset: 0; z-index: 400;
+    background: var(--graph-bg);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; pointer-events: all;
+  }
+  #intro-overlay.exiting {
+    animation: intro-exit 800ms cubic-bezier(.4,0,.2,1) forwards;
+  }
+  #intro-overlay.done { display: none; pointer-events: none; }
+
+  /* Grain texture via SVG filter */
+  #intro-overlay::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    background-size: 256px 256px; pointer-events: none;
+  }
+
+  /* Horizontal scan line */
+  .intro-scan {
+    position: absolute; top: -1px; left: 0; right: 0; height: 1px; z-index: 3;
+    background: linear-gradient(90deg, transparent 0%, var(--sage-dark) 20%, var(--sage) 50%, var(--sage-dark) 80%, transparent 100%);
+    opacity: 0;
+    animation: scan-sweep 1000ms cubic-bezier(.4,0,.6,1) 200ms forwards;
+  }
+  @keyframes scan-sweep {
+    0%   { transform: translateY(0vh);   opacity: 0; }
+    5%   { opacity: 0.9; }
+    95%  { opacity: 0.6; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  /* Center content */
+  .intro-content {
+    position: relative; z-index: 2; text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .intro-eyebrow {
+    font-family: var(--font-mono); font-size: 10px; color: var(--sage);
+    letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 20px;
+    opacity: 0; animation: fade-up 500ms ease 500ms forwards;
+  }
+  .intro-title {
+    font-family: var(--font-display); font-size: clamp(44px, 7vw, 88px);
+    font-weight: 300; color: var(--cream); line-height: 1.08;
+    letter-spacing: -0.025em;
+    opacity: 0; animation: fade-up 700ms ease 650ms forwards;
+  }
+  .intro-title em { font-style: italic; color: var(--sage-light); }
+  .intro-divider {
+    width: 48px; height: 0.5px; background: var(--sage-dark);
+    margin: 28px auto 0;
+    opacity: 0; animation: fade-in 400ms ease 900ms forwards;
+    transform-origin: center;
+    animation-name: scale-in-h;
+  }
+  @keyframes scale-in-h {
+    from { opacity: 0; transform: scaleX(0); }
+    to   { opacity: 1; transform: scaleX(1); }
+  }
+  .intro-meta {
+    font-family: var(--font-mono); font-size: 10px; color: #3A4A30;
+    margin-top: 16px; letter-spacing: 0.2em;
+    opacity: 0; animation: fade-up 400ms ease 1000ms forwards;
+  }
+  .intro-sep { margin: 0 14px; color: #2A3A22; }
+
+  /* Corner labels */
+  .intro-corner {
+    position: absolute; font-family: var(--font-mono); font-size: 9px;
+    color: #222218; letter-spacing: 0.12em;
+    opacity: 0; animation: fade-in 500ms ease 700ms forwards;
+  }
+  .intro-corner.tl { top: 36px; left: 48px; }
+  .intro-corner.tr { top: 36px; right: 48px; text-align: right; }
+  .intro-corner.bl { bottom: 36px; left: 48px; }
+  .intro-corner.br { bottom: 36px; right: 48px; text-align: right; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes intro-exit {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* FILTER SIDEBAR */
+  .filter-panel {
+    position: fixed; bottom: 32px; left: 48px; z-index: 100;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .filter-label { font-family: var(--font-mono); font-size: 9px; color: #3A3A2A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .filter-tag {
+    font-family: var(--font-mono); font-size: 10px; color: #5A5A4A; padding: 5px 12px;
+    border: 0.5px solid #2A2A20; border-radius: 2px; cursor: pointer; background: rgba(20,20,16,0.8);
+    transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+    user-select: none; backdrop-filter: blur(8px);
+  }
+  .filter-tag:hover { color: var(--sage-light); border-color: var(--sage); }
+  .filter-tag.active { color: var(--sage); border-color: var(--sage); background: rgba(42,58,34,0.6); }
+  .filter-tag.all-tag.active { color: var(--sage-light); }
+
+  /* NODE TOOLTIP */
+  .node-tooltip {
+    position: fixed; z-index: 100; pointer-events: none;
+    background: rgba(15,14,11,0.92); border: 0.5px solid var(--graph-border);
+    border-radius: 6px; padding: 10px 14px; backdrop-filter: blur(12px);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 150ms ease, transform 150ms ease;
+    max-width: 200px;
+  }
+  .node-tooltip.visible { opacity: 1; transform: translateY(0); }
+  .tooltip-label { font-family: var(--font-mono); font-size: 10px; color: var(--sage-light); margin-bottom: 4px; }
+  .tooltip-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tooltip-tag { font-family: var(--font-mono); font-size: 9px; color: #5A6A50; padding: 2px 7px; border: 0.5px solid #2E3D28; border-radius: 2px; }
+
+  /* INSTRUCTIONS */
+  .instructions {
+    position: fixed; bottom: 32px; right: 48px; z-index: 100;
+    font-family: var(--font-mono); font-size: 9px; color: #2E2E20;
+    line-height: 1.8; text-align: right;
+  }
+
+  /* PHOTO MODAL */
+  .photo-modal {
+    position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center;
+    background: rgba(10,10,8,0.88); backdrop-filter: blur(16px);
+    opacity: 0; pointer-events: none; transition: opacity 250ms ease;
+  }
+  .photo-modal.visible { opacity: 1; pointer-events: all; }
+  .modal-inner { background: var(--graph-surface); border: 0.5px solid var(--graph-border); border-radius: 12px; padding: 28px; max-width: 480px; width: calc(100% - 48px); }
+  .modal-img { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; margin-bottom: 16px; background: #1E2418; }
+  .modal-label { font-family: var(--font-mono); font-size: 11px; color: var(--sage); margin-bottom: 6px; }
+  .modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .modal-tag { font-family: var(--font-mono); font-size: 9px; color: #5A6A50; padding: 3px 9px; border: 0.5px solid #2E3D28; border-radius: 2px; }
+  .modal-close { font-family: var(--font-mono); font-size: 10px; color: #3A3A2A; cursor: pointer; float: right; transition: color 150ms ease; }
+  .modal-close:hover { color: var(--sage); }
+
+  @media (max-width: 700px) {
+    .nav { padding: 0 24px; }
+    .filter-panel { left: 24px; bottom: 24px; }
+    .instructions { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="intro-overlay">
+  <div class="intro-scan"></div>
+  <div class="intro-content">
+    <div class="intro-eyebrow">05 — graph</div>
+    <div class="intro-title">My life,<br><em>as a network.</em></div>
+    <div class="intro-divider"></div>
+    <div class="intro-meta">
+      <span id="intro-nodes">nodes: 14</span>
+      <span class="intro-sep">·</span>
+      <span id="intro-edges">edges: <span id="intro-edge-count">—</span></span>
+    </div>
+  </div>
+  <div class="intro-corner tl">graph / force-directed</div>
+  <div class="intro-corner tr">drag · zoom · explore</div>
+  <div class="intro-corner bl">overlake, 2025</div>
+  <div class="intro-corner br">edison hui</div>
+</div>
+
+<svg id="graph-canvas"></svg>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">EDISON</a>
+  <div class="nav-links">
+    <a href="/writing" class="nav-link">writing</a>
+    <a href="/projects" class="nav-link">projects</a>
+    <a href="/playground" class="nav-link">playground</a>
+    <a href="/graph" class="nav-link active">graph</a>
+    <a href="/about" class="nav-link">about</a>
+  </div>
+</nav>
+
+<div class="filter-panel">
+  <p class="filter-label">filter by tag</p>
+  <div id="tag-filters"></div>
+</div>
+
+<div class="node-tooltip" id="tooltip">
+  <div class="tooltip-label" id="tooltip-label"></div>
+  <div class="tooltip-tags" id="tooltip-tags"></div>
+</div>
+
+<div class="photo-modal" id="modal" onclick="closeModal(event)">
+  <div class="modal-inner">
+    <span class="modal-close" onclick="closeModal()">close ×</span>
+    <img class="modal-img" id="modal-img" src="" alt="">
+    <div class="modal-label" id="modal-label"></div>
+    <div class="modal-tags" id="modal-tags"></div>
+  </div>
+</div>
+
+<div class="instructions">
+  drag · scroll to zoom · click to open<br>
+  filter by tag ←
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const photoNodes = [
+  { id: 0, color: '#3D5232', label: 'graduation · 2025', tags: ['graduation','senior-year','nyc'], r: 28 },
+  { id: 1, color: '#2E4226', label: 'chess club', tags: ['chess','senior-year'], r: 20 },
+  { id: 2, color: '#35492C', label: 'senior project', tags: ['senior-year','web','code'], r: 22 },
+  { id: 3, color: '#3A3020', label: 'friends · nyc', tags: ['nyc','friends'], r: 18 },
+  { id: 4, color: '#2C3E28', label: 'hackathon', tags: ['code','friends'], r: 18 },
+  { id: 5, color: '#3E2E1A', label: 'family', tags: ['family','nyc'], r: 16 },
+  { id: 6, color: '#3A3020', label: 'central park', tags: ['nyc','friends'], r: 16 },
+  { id: 7, color: '#243620', label: 'tournament', tags: ['chess'], r: 13 },
+  { id: 8, color: '#283A22', label: 'late nights', tags: ['code','senior-year'], r: 15 },
+  { id: 9, color: '#2E2E1E', label: 'overlake', tags: ['senior-year'], r: 13 },
+  { id: 10, color: '#2A2E1C', label: 'coffee mornings', tags: ['nyc','thoughts'], r: 11 },
+  { id: 11, color: '#303020', label: 'club fair', tags: ['senior-year','chess'], r: 14 },
+  { id: 12, color: '#203018', label: 'debugging', tags: ['code','thoughts'], r: 13 },
+  { id: 13, color: '#2A2818', label: 'constitution hill', tags: ['nyc','friends'], r: 12 },
+];
+
+// Generate links from shared tags
+const links = [];
+for (let i = 0; i < photoNodes.length; i++) {
+  for (let j = i + 1; j < photoNodes.length; j++) {
+    const shared = photoNodes[i].tags.filter(t => photoNodes[j].tags.includes(t));
+    if (shared.length) links.push({ source: i, target: j, strength: shared.length });
+  }
+}
+
+const allTags = [...new Set(photoNodes.flatMap(n => n.tags))].sort();
+let activeTag = null;
+
+// Tag filter UI
+const filterWrap = document.getElementById('tag-filters');
+const allBtn = document.createElement('button');
+allBtn.className = 'filter-tag all-tag active';
+allBtn.textContent = 'all';
+allBtn.dataset.tag = '';
+filterWrap.appendChild(allBtn);
+allTags.forEach(tag => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-tag';
+  btn.textContent = tag;
+  btn.dataset.tag = tag;
+  filterWrap.appendChild(btn);
+});
+
+filterWrap.addEventListener('click', e => {
+  const btn = e.target.closest('.filter-tag');
+  if (!btn) return;
+  filterWrap.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTag = btn.dataset.tag || null;
+  applyFilter();
+});
+
+function applyFilter() {
+  node.selectAll('circle')
+    .transition().duration(300)
+    .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 1 : 0.08);
+  node.selectAll('text')
+    .transition().duration(300)
+    .attr('opacity', d => !activeTag || d.tags.includes(activeTag) ? 0.7 : 0.04);
+  link
+    .transition().duration(300)
+    .attr('opacity', d => {
+      if (!activeTag) return null;
+      return d.source.tags?.includes(activeTag) && d.target.tags?.includes(activeTag) ? 0.6 : 0.03;
+    });
+}
+
+const W = window.innerWidth;
+const H = window.innerHeight;
+
+const svg = d3.select('#graph-canvas')
+  .attr('width', W).attr('height', H);
+
+// Outer group for zoom/pan
+const g = svg.append('g');
+
+// Zoom
+svg.call(
+  d3.zoom().scaleExtent([0.25, 5])
+    .on('zoom', e => g.attr('transform', e.transform))
+);
+
+// Simulation
+const sim = d3.forceSimulation(photoNodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(d => 120 + (d.source.r + d.target.r) * 1.8).strength(0.25))
+  .force('charge', d3.forceManyBody().strength(d => -d.r * 32))
+  .force('center', d3.forceCenter(W / 2, H / 2).strength(0.04))
+  .force('collision', d3.forceCollide().radius(d => d.r + 24))
+  .alphaDecay(0.012)
+  .velocityDecay(0.4);
+
+// Edges
+const link = g.append('g').selectAll('line')
+  .data(links).join('line')
+  .attr('stroke', '#7A8B6F')
+  .attr('stroke-width', d => 0.6 + d.strength * 0.2)
+  .attr('opacity', d => 0.2 + d.strength * 0.1);
+
+// Nodes
+const node = g.append('g').selectAll('g')
+  .data(photoNodes).join('g')
+  .style('cursor', 'pointer')
+  .call(
+    d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+  );
+
+// Clip paths for circular images
+const defs = svg.append('defs');
+photoNodes.forEach(d => {
+  defs.append('clipPath').attr('id', `clip-${d.id}`)
+    .append('circle').attr('r', d.r);
+});
+
+node.append('circle')
+  .attr('r', d => d.r)
+  .attr('fill', d => d.color)
+  .attr('stroke', '#7A8B6F')
+  .attr('stroke-width', d => d.r > 20 ? 1.2 : 0.8)
+  .attr('opacity', 1);
+
+// Labels
+node.append('text')
+  .text(d => d.label)
+  .attr('y', d => d.r + 14)
+  .attr('text-anchor', 'middle')
+  .attr('font-family', "'JetBrains Mono', monospace")
+  .attr('font-size', d => d.r > 20 ? 9 : 8)
+  .attr('fill', '#6A7B5F')
+  .attr('opacity', 0.7)
+  .attr('pointer-events', 'none');
+
+// Hover
+const tooltip = document.getElementById('tooltip');
+const tooltipLabel = document.getElementById('tooltip-label');
+const tooltipTags = document.getElementById('tooltip-tags');
+
+node.on('mouseenter', (e, d) => {
+  node.selectAll('circle').attr('opacity', n => n.id === d.id ? 1 : 0.25);
+  link.attr('opacity', l => l.source.id === d.id || l.target.id === d.id ? 0.8 : 0.04);
+  d3.select(e.currentTarget).select('circle')
+    .transition().duration(200).attr('r', d.r * 1.25).attr('opacity', 1);
+
+  tooltipLabel.textContent = d.label;
+  tooltipTags.innerHTML = d.tags.map(t => `<span class="tooltip-tag">${t}</span>`).join('');
+  tooltip.classList.add('visible');
+})
+.on('mousemove', e => {
+  tooltip.style.left = (e.clientX + 16) + 'px';
+  tooltip.style.top = (e.clientY - 8) + 'px';
+})
+.on('mouseleave', (e, d) => {
+  applyFilter();
+  d3.select(e.currentTarget).select('circle')
+    .transition().duration(200).attr('r', d.r);
+  tooltip.classList.remove('visible');
+})
+.on('click', (e, d) => {
+  e.stopPropagation();
+  document.getElementById('modal-img').src = `https://placehold.co/480x480/${d.color.replace('#','')}/7A8B6F?text=`;
+  document.getElementById('modal-label').textContent = d.label;
+  document.getElementById('modal-tags').innerHTML = d.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
+  document.getElementById('modal').classList.add('visible');
+});
+
+svg.on('click', () => closeModal());
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('visible');
+  }
+}
+
+// Tick
+sim.on('tick', () => {
+  link
+    .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+
+// Set edge count in intro overlay
+document.getElementById('intro-edge-count').textContent = links.length;
+
+// Initially hide all nodes and edges — they'll animate in after the overlay leaves
+node.selectAll('circle').attr('r', 0).attr('opacity', 0);
+node.selectAll('text').attr('opacity', 0);
+link.attr('opacity', 0).attr('stroke-dasharray', function() {
+  const len = this.getTotalLength ? this.getTotalLength() : 80;
+  return `${len} ${len}`;
+}).attr('stroke-dashoffset', function() {
+  const len = this.getTotalLength ? this.getTotalLength() : 80;
+  return len;
+});
+
+// Intro sequence: hold title, then exit overlay, then assemble graph
+const HOLD_MS   = 1500; // how long title shows
+const EXIT_MS   = 800;  // overlay fade duration
+const introEl   = document.getElementById('intro-overlay');
+
+setTimeout(() => {
+  // Trigger overlay fade out
+  introEl.classList.add('exiting');
+
+  // After overlay is gone, hide it
+  setTimeout(() => introEl.classList.add('done'), EXIT_MS);
+
+  // Stagger nodes in (pop up like constellations forming)
+  node.selectAll('circle')
+    .transition()
+    .delay((d, i) => 200 + i * 70)
+    .duration(500)
+    .ease(d3.easeBackOut.overshoot(1.4))
+    .attr('r', d => d.r)
+    .attr('opacity', 1);
+
+  node.selectAll('text')
+    .transition()
+    .delay((d, i) => 400 + i * 70)
+    .duration(350)
+    .ease(d3.easeCubicOut)
+    .attr('opacity', 0.7);
+
+  // Edges draw in after nodes
+  link
+    .transition()
+    .delay((d, i) => 700 + i * 25)
+    .duration(600)
+    .ease(d3.easeCubicOut)
+    .attr('stroke-dashoffset', 0)
+    .attr('opacity', d => 0.2 + d.strength * 0.1)
+    .on('end', function() {
+      d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+    });
+
+}, HOLD_MS);
+
+window.addEventListener('resize', () => {
+  svg.attr('width', window.innerWidth).attr('height', window.innerHeight);
+  sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+  sim.alpha(0.2).restart();
+});
+</script>
+</body>
+</html>

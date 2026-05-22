@@ -121,6 +121,21 @@
     object-fit: cover;
     z-index: 0;
   }
+  /* Top scrim — lifts nav contrast over the dark ink zone without a visible overlay */
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      rgba(245, 242, 235, 0.52) 0%,
+      rgba(245, 242, 235, 0.18) 60%,
+      rgba(245, 242, 235, 0) 100%
+    );
+    pointer-events: none;
+  }
   /* Soft cream vignette on the LEFT only — pulls the text out of the video without an overlay panel */
   .hero::after {
     content: "";
@@ -550,6 +565,12 @@
   }
   .footer-link:hover { color: var(--clay); }
 
+  /* HERO ENTRANCE */
+  .pe-nav{animation:pe-dn 500ms cubic-bezier(.22,1,.36,1) both}
+  .pe-up{animation:pe-up 720ms cubic-bezier(.22,1,.36,1) var(--d,0ms) both}
+  @keyframes pe-dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes pe-up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
   /* ---------- SCROLL REVEALS ---------- */
   .reveal {
     opacity: 0;
@@ -591,11 +612,11 @@
 <body>
 
   <!-- NAV -->
-  <nav class="nav" id="nav">
+  <nav class="nav pe-nav" id="nav">
     <a href="#top" class="nav-brand">EDISON</a>
     <div class="nav-links">
-      <a href="#writing" class="nav-link">writing</a>
-      <a href="#projects" class="nav-link">projects</a>
+      <a href="/writing" class="nav-link">writing</a>
+      <a href="/projects" class="nav-link">projects</a>
       <a href="/playground" class="nav-link">playground</a>
       <a href="/graph" class="nav-link">graph</a>
       <a href="/about" class="nav-link">about</a>
@@ -608,11 +629,11 @@
       <source src="Assets/Hero/1779387124313-arhap1f9v3o.mp4" type="video/mp4">
     </video>
     <div class="hero-text">
-      <div class="hero-eyebrow">edison · cs '26</div>
-      <h1 class="hero-name">Edison</h1>
-      <p class="hero-tagline">Building things.<br><em>Writing thoughts.</em></p>
+      <div class="hero-eyebrow pe-up" style="--d:280ms">edison · cs '26</div>
+      <h1 class="hero-name pe-up" style="--d:420ms">Edison</h1>
+      <p class="hero-tagline pe-up" style="--d:580ms">Building things.<br><em>Writing thoughts.</em></p>
     </div>
-    <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll pe-up" style="--d:820ms" aria-hidden="true">
       <span class="hero-scroll-line"></span>
     </div>
   </section>
@@ -623,7 +644,7 @@
       <div class="section-header-left">
         <span class="eyebrow"><span class="eyebrow-num">02</span>writing</span>
       </div>
-      <a href="#writing" class="section-link">all posts →</a>
+      <a href="/writing" class="section-link">all posts →</a>
     </div>
     <h2 class="section-title reveal" style="margin-bottom: 56px; max-width: 720px; --reveal-delay: 80ms;">Things I've been<br>thinking about lately.</h2>
 

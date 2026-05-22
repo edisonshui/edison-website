@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — Edison</title>
+<meta name="description" content="Essays, notes, and things I keep returning to.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EB; --paper: #EAE6DC; --parchment: #D6D1C4;
+    --stone: #B8AC9A; --warm-gray: #8A8070; --warm-black: #1C1A14;
+    --sage: #7A8B6F; --sage-light: #C8D4B8; --sage-dark: #4A5E3A;
+    --clay: #B86A3E; --clay-dark: #7A4A28; --graph-bg: #0F0E0B;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--cream); color: var(--warm-black); font-family: var(--font-ui); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+
+  /* NAV */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 64px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 100;
+    background: rgba(245,242,235,0.88); backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 0.5px solid rgba(214,209,196,0.6);
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: 0.08em; color: var(--warm-black); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-link { font-size: 12px; font-weight: 400; color: var(--warm-gray); letter-spacing: 0.02em; padding: 6px 0; position: relative; transition: color 200ms ease; }
+  .nav-link.active { color: var(--warm-black); font-weight: 500; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--clay); transform: scaleX(0); transform-origin: left; transition: transform 220ms ease; }
+  .nav-link:hover { color: var(--clay); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* PAGE HEADER */
+  .page-header { padding: 152px 64px 72px; max-width: 1100px; margin: 0 auto; }
+  .eyebrow { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 20px; }
+  .eyebrow-num { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--clay); margin-right: 12px; vertical-align: -1px; }
+  .page-title { font-family: var(--font-display); font-size: clamp(44px, 5.5vw, 72px); font-weight: 300; letter-spacing: -0.01em; line-height: 1; color: var(--warm-black); margin-bottom: 20px; max-width: 640px; }
+  .page-desc { font-size: 14px; color: var(--warm-gray); line-height: 1.75; max-width: 400px; }
+
+  /* FILTER */
+  .filter-row { max-width: 1100px; margin: 0 auto; padding: 0 64px 48px; border-bottom: 0.5px solid var(--parchment); display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-pill { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: lowercase; padding: 7px 16px; border-radius: 2px; cursor: pointer; border: 0.5px solid var(--parchment); background: var(--paper); color: var(--warm-gray); transition: background 120ms ease, color 120ms ease, border-color 120ms ease; user-select: none; }
+  .filter-pill.active { background: var(--sage-light); color: var(--sage-dark); border-color: transparent; }
+  .filter-pill:hover:not(.active) { background: var(--parchment); color: var(--warm-black); }
+
+  /* POST LIST */
+  .post-list-wrap { max-width: 1100px; margin: 0 auto; padding: 0 64px 120px; }
+  .post {
+    display: grid; grid-template-columns: 140px 1fr auto;
+    gap: 40px; align-items: start; padding: 32px 0;
+    border-bottom: 0.5px solid var(--parchment);
+    transition: opacity 180ms ease;
+  }
+  .post.hidden { display: none; }
+  .post:hover .post-title { color: var(--clay); }
+  .post-date { font-family: var(--font-ui); font-size: 11px; font-weight: 500; color: var(--sage-dark); letter-spacing: 0.06em; text-transform: uppercase; padding-top: 5px; }
+  .post-body { display: flex; flex-direction: column; gap: 10px; }
+  .post-title { font-family: var(--font-display); font-size: 28px; font-weight: 400; line-height: 1.15; color: var(--warm-black); transition: color 150ms ease; }
+  .post-excerpt { font-size: 13px; color: var(--warm-gray); line-height: 1.7; max-width: 560px; }
+  .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .post-tag { font-size: 10px; color: var(--sage-dark); letter-spacing: 0.06em; background: var(--sage-light); padding: 3px 10px; border-radius: 2px; }
+  .post-arrow { font-size: 11px; color: var(--stone); padding-top: 8px; transition: color 150ms ease, transform 150ms ease; display: inline-block; }
+  .post:hover .post-arrow { color: var(--clay); transform: translateX(3px); }
+
+  /* FOOTER */
+  .footer { border-top: 0.5px solid var(--parchment); background: var(--cream); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 56px 64px 48px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+  .footer-brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.08em; color: var(--warm-black); margin-bottom: 8px; }
+  .footer-meta { font-size: 11px; font-style: italic; color: var(--stone); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-link { font-size: 12px; color: var(--warm-gray); transition: color 120ms ease; }
+  .footer-link:hover { color: var(--clay); }
+
+  /* PAGE ENTRANCE */
+  .pe-bar{position:fixed;top:0;left:0;right:0;height:1.5px;background:var(--clay);transform-origin:left;z-index:9999;pointer-events:none;animation:pe-bar 700ms cubic-bezier(.4,0,.2,1) both}
+  @keyframes pe-bar{0%{transform:scaleX(0);opacity:1}80%{transform:scaleX(1);opacity:1}to{transform:scaleX(1);opacity:0}}
+  .pe-nav{animation:pe-dn 500ms cubic-bezier(.22,1,.36,1) both}
+  .pe-up{animation:pe-up 650ms cubic-bezier(.22,1,.36,1) var(--d,0ms) both}
+  @keyframes pe-dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes pe-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  @media (max-width: 900px) {
+    .nav { padding: 0 24px; }
+    .page-header { padding: 120px 24px 56px; }
+    .filter-row { padding: 0 24px 40px; }
+    .post-list-wrap { padding: 0 24px 80px; }
+    .post { grid-template-columns: 1fr; gap: 10px; padding: 24px 0; }
+    .post-date { padding-top: 0; }
+    .post-title { font-size: 24px; }
+    .post-arrow { display: none; }
+    .footer-inner { padding: 48px 24px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="pe-bar"></div>
+
+<nav class="nav pe-nav">
+  <a href="/" class="nav-brand">EDISON</a>
+  <div class="nav-links">
+    <a href="/writing" class="nav-link active">writing</a>
+    <a href="/projects" class="nav-link">projects</a>
+    <a href="/playground" class="nav-link">playground</a>
+    <a href="/graph" class="nav-link">graph</a>
+    <a href="/about" class="nav-link">about</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p class="eyebrow pe-up" style="--d:0ms"><span class="eyebrow-num">01</span>writing</p>
+  <h1 class="page-title pe-up" style="--d:90ms">Everything I've<br>been thinking about.</h1>
+  <p class="page-desc pe-up" style="--d:170ms">Essays and notes. Usually about building things, sometimes about chess, occasionally neither.</p>
+</div>
+
+<div class="filter-row pe-up" style="--d:260ms">
+  <button class="filter-pill active" data-tag="all">all</button>
+  <button class="filter-pill" data-tag="chess">chess</button>
+  <button class="filter-pill" data-tag="algorithms">algorithms</button>
+  <button class="filter-pill" data-tag="web">web</button>
+  <button class="filter-pill" data-tag="cs">cs</button>
+  <button class="filter-pill" data-tag="tutorials">tutorials</button>
+  <button class="filter-pill" data-tag="community">community</button>
+  <button class="filter-pill" data-tag="thoughts">thoughts</button>
+</div>
+
+<div class="post-list-wrap">
+  <div id="post-list">
+
+    <a href="/writing/chess-engine" class="post" data-tags="chess algorithms">
+      <span class="post-date">May 12, 2025</span>
+      <div class="post-body">
+        <span class="post-title">building a chess engine that actually beats me</span>
+        <span class="post-excerpt">I spent three weeks on minimax with alpha-beta pruning. Here's what I got wrong first, and what finally made it click.</span>
+        <div class="post-tags"><span class="post-tag">chess</span><span class="post-tag">algorithms</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+    <a href="#" class="post" data-tags="web community">
+      <span class="post-date">Apr 03, 2025</span>
+      <div class="post-body">
+        <span class="post-title">what I learned building websites for the restaurants on my block</span>
+        <span class="post-excerpt">A senior project that started as a CS requirement and turned into something I actually care about. The hard part wasn't the code.</span>
+        <div class="post-tags"><span class="post-tag">web</span><span class="post-tag">community</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+    <a href="#" class="post" data-tags="cs tutorials">
+      <span class="post-date">Mar 18, 2025</span>
+      <div class="post-body">
+        <span class="post-title">three weeks in, my recursion finally stopped lying to me</span>
+        <span class="post-excerpt">I kept thinking I understood it. The call stack disagreed. This is the explanation I wish someone had given me at the start.</span>
+        <div class="post-tags"><span class="post-tag">cs</span><span class="post-tag">tutorials</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+    <a href="#" class="post" data-tags="thoughts">
+      <span class="post-date">Feb 20, 2025</span>
+      <div class="post-body">
+        <span class="post-title">why I switched from vim to a normal editor and what it cost me</span>
+        <span class="post-excerpt">Eighteen months of muscle memory, gone. Also: I'm faster now, and I'm still not sure how to feel about that.</span>
+        <div class="post-tags"><span class="post-tag">thoughts</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+    <a href="#" class="post" data-tags="web cs">
+      <span class="post-date">Jan 14, 2025</span>
+      <div class="post-body">
+        <span class="post-title">the first time I deployed something real and immediately had to fix it</span>
+        <span class="post-excerpt">Three hours after the restaurant site went live, the menu section was showing December specials. In April. Here's the postmortem.</span>
+        <div class="post-tags"><span class="post-tag">web</span><span class="post-tag">cs</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+    <a href="#" class="post" data-tags="chess thoughts">
+      <span class="post-date">Dec 08, 2024</span>
+      <div class="post-body">
+        <span class="post-title">what chess taught me about debugging</span>
+        <span class="post-excerpt">In chess you can always retrace your moves. I kept wishing code worked the same way. Eventually I built something that did.</span>
+        <div class="post-tags"><span class="post-tag">chess</span><span class="post-tag">thoughts</span></div>
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">EDISON</div><div class="footer-meta">© 2026 · still tinkering</div></div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">github</a>
+      <a href="#" class="footer-link">email</a>
+      <a href="#" class="footer-link">resume</a>
+      <a href="#" class="footer-link">rss</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Stagger posts
+  document.querySelectorAll('#post-list .post').forEach((el, i) => {
+    el.classList.add('pe-up');
+    el.style.setProperty('--d', (350 + i * 60) + 'ms');
+  });
+
+  const pills = document.querySelectorAll('.filter-pill');
+  const posts = document.querySelectorAll('.post');
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const tag = pill.dataset.tag;
+      posts.forEach(post => {
+        if (tag === 'all') { post.classList.remove('hidden'); }
+        else { post.classList.toggle('hidden', !post.dataset.tags.split(' ').includes(tag)); }
+      });
+    });
+  });
+</script>
+</body>
+</html>
