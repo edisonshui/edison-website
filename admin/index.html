@@ -25,13 +25,8 @@
     -webkit-font-smoothing: antialiased; min-height: 100vh;
   }
 
-  /* ── LAYOUT ── */
-  .page {
-    max-width: 580px; margin: 0 auto;
-    padding: 96px 32px 120px;
-  }
+  .page { max-width: 580px; margin: 0 auto; padding: 96px 32px 120px; }
 
-  /* ── HEADER ── */
   .page-header {
     display: flex; align-items: baseline; justify-content: space-between;
     margin-bottom: 56px; border-bottom: 0.5px solid var(--parchment); padding-bottom: 24px;
@@ -48,11 +43,9 @@
   }
   .back-link:hover { color: var(--sage); border-bottom-color: var(--sage); }
 
-  /* ── VIEWS ── */
   #login-view, #upload-view { display: none; }
   #login-view.active, #upload-view.active { display: block; }
 
-  /* ── FORM ELEMENTS ── */
   .form-section { margin-bottom: 56px; }
   .form-label {
     display: block; font-family: var(--font-mono); font-size: 10px;
@@ -70,26 +63,17 @@
   .form-input:focus { border-color: var(--sage); background: var(--cream); }
   .form-input::placeholder { color: var(--stone); }
 
-  input[type="file"].form-input {
-    padding: 10px 16px; cursor: pointer;
-    font-family: var(--font-mono); font-size: 11px;
-  }
+  input[type="file"].form-input { padding: 10px 16px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; }
   input[type="file"].form-input::-webkit-file-upload-button {
     font-family: var(--font-mono); font-size: 10px;
     background: var(--parchment); border: 0.5px solid var(--stone);
-    padding: 4px 10px; border-radius: 2px; cursor: pointer;
-    margin-right: 12px; transition: background 150ms ease;
+    padding: 4px 10px; border-radius: 2px; cursor: pointer; margin-right: 12px;
+    transition: background 150ms ease;
   }
-  input[type="file"].form-input::-webkit-file-upload-button:hover {
-    background: var(--sage-light);
-  }
+  input[type="file"].form-input::-webkit-file-upload-button:hover { background: var(--sage-light); }
 
-  .form-hint {
-    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
-    margin-top: 6px; letter-spacing: 0.04em;
-  }
+  .form-hint { font-family: var(--font-mono); font-size: 10px; color: var(--stone); margin-top: 6px; letter-spacing: 0.04em; }
 
-  /* ── PREVIEW ── */
   #img-preview {
     width: 120px; height: 120px; border-radius: 6px; object-fit: cover;
     border: 0.5px solid var(--parchment); background: var(--paper);
@@ -97,97 +81,149 @@
   }
   #img-preview.visible { display: block; }
 
-  /* ── BUTTONS ── */
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
     padding: 12px 28px; border-radius: 3px; cursor: pointer; border: none;
     transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
   }
-  .btn-primary {
-    background: var(--warm-black); color: var(--cream);
-  }
+  .btn-primary { background: var(--warm-black); color: var(--cream); }
   .btn-primary:hover { background: #2E2C24; }
   .btn-primary:active { background: #3A3828; }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-ghost {
-    background: transparent; color: var(--stone);
-    border: 0.5px solid var(--parchment);
-  }
+  .btn-ghost { background: transparent; color: var(--stone); border: 0.5px solid var(--parchment); }
   .btn-ghost:hover { color: var(--sage); border-color: var(--sage); }
 
-  /* ── STATUS MESSAGE ── */
-  .status {
-    font-family: var(--font-mono); font-size: 11px;
-    padding: 10px 14px; border-radius: 4px; margin-top: 16px;
-    display: none;
-  }
+  .status { font-family: var(--font-mono); font-size: 11px; padding: 10px 14px; border-radius: 4px; margin-top: 16px; display: none; }
   .status.visible { display: block; }
   .status.success { background: rgba(74,94,58,0.12); color: var(--sage-dark); border: 0.5px solid var(--sage-dark); }
   .status.error { background: rgba(184,106,62,0.1); color: var(--clay-dark); border: 0.5px solid var(--clay); }
 
-  /* ── DIVIDER ── */
-  .divider {
-    height: 0.5px; background: var(--parchment); margin: 56px 0;
-  }
+  .divider { height: 0.5px; background: var(--parchment); margin: 56px 0; }
 
-  /* ── PHOTO LIST ── */
-  .list-header {
-    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
-    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;
-  }
-  .photo-list { display: flex; flex-direction: column; gap: 0; }
+  .list-header { font-family: var(--font-mono); font-size: 10px; color: var(--stone); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
+  .photo-list { display: flex; flex-direction: column; }
   .photo-row {
     display: grid; grid-template-columns: 56px 1fr auto;
     align-items: center; gap: 16px;
     padding: 16px 0; border-top: 0.5px solid var(--parchment);
   }
   .photo-row:last-child { border-bottom: 0.5px solid var(--parchment); }
-  .photo-thumb {
-    width: 56px; height: 56px; border-radius: 4px; object-fit: cover;
-    background: var(--paper); border: 0.5px solid var(--parchment);
-  }
+  .photo-thumb { width: 56px; height: 56px; border-radius: 4px; object-fit: cover; background: var(--paper); border: 0.5px solid var(--parchment); flex-shrink: 0; }
   .photo-info { min-width: 0; }
-  .photo-title {
-    font-family: var(--font-display); font-size: 17px; font-weight: 400;
-    color: var(--warm-black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .photo-meta {
-    font-family: var(--font-mono); font-size: 9px; color: var(--stone);
-    letter-spacing: 0.06em; margin-top: 2px;
-  }
-  .photo-delete {
+  .photo-title { font-family: var(--font-display); font-size: 17px; font-weight: 400; color: var(--warm-black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .photo-meta { font-family: var(--font-mono); font-size: 9px; color: var(--stone); letter-spacing: 0.06em; margin-top: 2px; }
+
+  .photo-actions { display: flex; align-items: center; gap: 4px; }
+  .photo-delete, .btn-edit {
     font-family: var(--font-mono); font-size: 9px; color: #C8B8A8;
     letter-spacing: 0.06em; cursor: pointer; padding: 4px 8px;
     border: 0.5px solid transparent; border-radius: 2px;
-    transition: color 150ms ease, border-color 150ms ease;
-    background: none;
+    transition: color 150ms ease, border-color 150ms ease; background: none;
   }
-  .photo-delete:hover { color: var(--sage); border-color: var(--sage-light); }
+  .photo-delete:hover { color: var(--clay); border-color: rgba(184,106,62,0.3); }
+  .btn-edit:hover { color: var(--warm-gray); border-color: var(--parchment); }
+  .actions-sep { font-family: var(--font-mono); font-size: 8px; color: var(--parchment); }
 
-  .list-empty {
-    font-family: var(--font-mono); font-size: 11px; color: var(--stone);
-    padding: 24px 0; text-align: center;
-  }
+  .list-empty { font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 24px 0; text-align: center; }
 
-  /* ── LOGOUT ── */
-  .logout-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 40px;
-  }
-  .logged-in-as {
-    font-family: var(--font-mono); font-size: 10px; color: var(--stone);
-    letter-spacing: 0.06em;
-  }
+  .logout-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+  .logged-in-as { font-family: var(--font-mono); font-size: 10px; color: var(--stone); letter-spacing: 0.06em; }
   .logged-in-as strong { color: var(--warm-gray); }
 
-  /* ── SPINNER ── */
-  .spinner {
-    display: inline-block; width: 12px; height: 12px;
-    border: 1.5px solid rgba(245,242,235,0.3); border-top-color: var(--cream);
-    border-radius: 50%; animation: spin 600ms linear infinite;
-  }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 1.5px solid rgba(245,242,235,0.3); border-top-color: var(--cream); border-radius: 50%; animation: spin 600ms linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DATE PICKER ── */
+  .dp-wrap { position: relative; }
+
+  .dp-trigger {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 12px 16px; cursor: pointer; user-select: none;
+    border: 0.5px solid var(--parchment); border-radius: 4px;
+    background: var(--paper); color: var(--warm-black);
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .dp-trigger:hover, .dp-trigger.open { border-color: var(--sage); background: var(--cream); }
+
+  .dp-display {
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.1em;
+    color: var(--warm-black); flex: 1;
+  }
+  .dp-display.empty { font-size: 11px; letter-spacing: 0.04em; color: var(--stone); }
+  .dp-chevron { font-family: var(--font-mono); font-size: 10px; color: var(--stone); margin-left: 8px; }
+
+  .dp-cal {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 200;
+    background: var(--cream); border: 0.5px solid var(--parchment); border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(28,26,20,0.10), 0 2px 8px rgba(28,26,20,0.05);
+  }
+
+  .dp-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .dp-nav-btn {
+    background: none; border: none; cursor: pointer; padding: 4px 10px; border-radius: 2px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--stone);
+    transition: color 100ms ease, background 100ms ease;
+  }
+  .dp-nav-btn:hover:not(:disabled) { color: var(--warm-black); background: var(--paper); }
+  .dp-nav-btn:disabled { color: var(--parchment); cursor: default; }
+  .dp-month-yr { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warm-black); }
+
+  .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .dp-col-hd { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.06em; color: var(--stone); text-align: center; padding: 2px 0 10px; }
+  .dp-cell {
+    font-family: var(--font-mono); font-size: 11px; color: var(--warm-black);
+    text-align: center; padding: 6px 2px; border-radius: 3px; cursor: pointer; line-height: 1;
+    transition: background 80ms ease, color 80ms ease;
+  }
+  .dp-cell:hover:not(.dp-fut):not(.dp-blank) { background: var(--paper); }
+  .dp-blank { cursor: default; }
+  .dp-fut { color: var(--parchment); cursor: default; }
+  .dp-today { color: var(--sage-dark); }
+  .dp-sel { background: var(--warm-black) !important; color: var(--cream) !important; }
+
+  .dp-footer { display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid var(--parchment); }
+  .dp-clear-btn {
+    background: none; border: none; cursor: pointer; padding: 3px 0;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; color: var(--stone);
+    transition: color 100ms ease;
+  }
+  .dp-clear-btn:hover { color: var(--clay); }
+
+  /* ── EDIT ROW ── */
+  .photo-row--editing {
+    align-items: start;
+    background: var(--paper); border-radius: 4px; padding: 14px 12px;
+  }
+  .photo-row--editing .photo-thumb { margin-top: 3px; }
+
+  .photo-edit-fields { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .photo-edit-field > label {
+    display: block; font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); margin-bottom: 5px;
+  }
+  .form-input--sm {
+    width: 100%; padding: 7px 11px; border: 0.5px solid var(--parchment); border-radius: 3px;
+    background: var(--cream); color: var(--warm-black);
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; outline: none;
+    transition: border-color 150ms ease;
+  }
+  .form-input--sm:focus { border-color: var(--sage); }
+  .form-input--sm::placeholder { color: var(--stone); }
+  .dp-wrap--sm .dp-trigger { padding: 7px 11px; }
+  .dp-wrap--sm .dp-display { font-size: 11px; }
+
+  .photo-edit-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .btn-save-edit, .btn-cancel-edit {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em;
+    padding: 5px 10px; border-radius: 2px; cursor: pointer; background: none;
+    transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+  }
+  .btn-save-edit { color: var(--sage-dark); border: 0.5px solid var(--sage-light); }
+  .btn-save-edit:hover { background: var(--sage-light); }
+  .btn-cancel-edit { color: var(--stone); border: 0.5px solid transparent; }
+  .btn-cancel-edit:hover { color: var(--warm-gray); border-color: var(--parchment); }
 </style>
 </head>
 <body>
@@ -209,9 +245,7 @@
       <label class="form-label" for="password">password</label>
       <input class="form-input" type="password" id="password" autocomplete="current-password" placeholder="••••••••">
     </div>
-    <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
-      sign in
-    </button>
+    <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">sign in</button>
     <div class="status" id="login-status"></div>
   </div>
 
@@ -240,12 +274,10 @@
         <p class="form-hint">comma-separated · lowercase</p>
       </div>
       <div class="form-section">
-        <label class="form-label" for="date">date</label>
-        <input class="form-input" type="date" id="date">
+        <label class="form-label">date</label>
+        <div class="dp-wrap" id="dp-upload"></div>
       </div>
-      <button class="btn btn-primary" type="submit" id="upload-btn">
-        upload to graph
-      </button>
+      <button class="btn btn-primary" type="submit" id="upload-btn">upload to graph</button>
       <div class="status" id="upload-status"></div>
     </form>
 
@@ -264,9 +296,10 @@
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const SUPABASE_URL  = 'https://gocoagynibdrqhalhtiz.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvY29hZ3luaWJkcnFoYWxodGl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTU4MjYsImV4cCI6MjA5NTAzMTgyNn0.-DoLtBAHK-tLZDs5yd4rJRN2_ptZCiSS28MJQ_J2vGU';
-
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const photoData = {};
 
 // ─── VIEWS ───────────────────────────────────────────────────────────────────
 function showLogin()  { document.getElementById('login-view').className  = 'active'; document.getElementById('upload-view').className = ''; }
@@ -288,28 +321,17 @@ async function handleLogin() {
   const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   const btn      = document.getElementById('login-btn');
-
   clearStatus('login-status');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> signing in…';
-
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
   btn.disabled = false;
   btn.textContent = 'sign in';
-
-  if (error) {
-    setStatus('login-status', error.message, 'error');
-    return;
-  }
-
+  if (error) { setStatus('login-status', error.message, 'error'); return; }
   enterUploadView(data.user);
 }
 
-async function handleLogout() {
-  await sb.auth.signOut();
-  showLogin();
-}
+async function handleLogout() { await sb.auth.signOut(); showLogin(); }
 
 function enterUploadView(user) {
   document.getElementById('user-email').textContent = user.email;
@@ -322,12 +344,99 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('file').addEventListener('change', e => {
     const file = e.target.files[0];
     const preview = document.getElementById('img-preview');
-    if (file) {
-      preview.src = URL.createObjectURL(file);
-      preview.classList.add('visible');
-    } else {
-      preview.classList.remove('visible');
-    }
+    if (file) { preview.src = URL.createObjectURL(file); preview.classList.add('visible'); }
+    else { preview.classList.remove('visible'); }
+  });
+  dpCreate('dp-upload', null);
+});
+
+// ─── DATE PICKER ─────────────────────────────────────────────────────────────
+const dpState = {};
+const DP_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DP_DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function dpFmt(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-');
+  return `${parseInt(d)} · ${DP_MONTHS[parseInt(m)-1].slice(0,3).toUpperCase()} · ${y}`;
+}
+
+function dpCreate(id, initialValue) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  let viewYear = today.getFullYear(), viewMonth = today.getMonth();
+  if (initialValue) {
+    const p = initialValue.split('-');
+    viewYear = parseInt(p[0]); viewMonth = parseInt(p[1]) - 1;
+  }
+  dpState[id] = { value: initialValue || null, viewYear, viewMonth, open: false };
+  dpRender(id);
+}
+
+function dpRender(id) {
+  const container = document.getElementById(id);
+  if (!container || !dpState[id]) return;
+  const s = dpState[id];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const atCurMonth = s.viewYear === today.getFullYear() && s.viewMonth === today.getMonth();
+
+  const display = dpFmt(s.value);
+  const firstDay = new Date(s.viewYear, s.viewMonth, 1).getDay();
+  const daysInMonth = new Date(s.viewYear, s.viewMonth + 1, 0).getDate();
+
+  let grid = DP_DAYS.map(d => `<span class="dp-col-hd">${d}</span>`).join('');
+  for (let i = 0; i < firstDay; i++) grid += `<span class="dp-cell dp-blank"></span>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dObj = new Date(s.viewYear, s.viewMonth, d);
+    const dStr = `${s.viewYear}-${String(s.viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const fut = dObj > today, sel = s.value === dStr, now = dObj.getTime() === today.getTime();
+    let cls = 'dp-cell';
+    if (fut) cls += ' dp-fut';
+    else if (sel) cls += ' dp-sel';
+    else if (now) cls += ' dp-today';
+    const click = fut ? '' : `onclick="dpPick('${id}','${dStr}')"`;
+    grid += `<span class="${cls}" ${click}>${d}</span>`;
+  }
+
+  const cal = s.open ? `
+    <div class="dp-cal">
+      <div class="dp-nav">
+        <button type="button" class="dp-nav-btn" onclick="dpPrev('${id}')">←</button>
+        <span class="dp-month-yr">${DP_MONTHS[s.viewMonth].toUpperCase()} ${s.viewYear}</span>
+        <button type="button" class="dp-nav-btn" onclick="dpNext('${id}')" ${atCurMonth ? 'disabled' : ''}>→</button>
+      </div>
+      <div class="dp-grid">${grid}</div>
+      ${s.value ? `<div class="dp-footer"><button type="button" class="dp-clear-btn" onclick="dpClear('${id}')">clear date</button></div>` : ''}
+    </div>` : '';
+
+  container.innerHTML = `
+    <div class="dp-trigger${s.open ? ' open' : ''}" onclick="dpToggle('${id}')">
+      <span class="dp-display${display ? '' : ' empty'}">${display || 'select date'}</span>
+      <span class="dp-chevron">${s.open ? '↑' : '↓'}</span>
+    </div>${cal}`;
+}
+
+function dpToggle(id) { dpState[id].open = !dpState[id].open; dpRender(id); }
+function dpPick(id, v) { dpState[id].value = v; dpState[id].open = false; dpRender(id); }
+function dpClear(id)   { dpState[id].value = null; dpState[id].open = false; dpRender(id); }
+
+function dpPrev(id) {
+  const s = dpState[id];
+  if (s.viewMonth === 0) { s.viewMonth = 11; s.viewYear--; } else s.viewMonth--;
+  dpRender(id);
+}
+function dpNext(id) {
+  const s = dpState[id];
+  const t = new Date();
+  if (s.viewYear === t.getFullYear() && s.viewMonth === t.getMonth()) return;
+  if (s.viewMonth === 11) { s.viewMonth = 0; s.viewYear++; } else s.viewMonth++;
+  dpRender(id);
+}
+
+document.addEventListener('mousedown', e => {
+  Object.keys(dpState).forEach(id => {
+    if (!dpState[id].open) return;
+    const w = document.getElementById(id);
+    if (w && !w.contains(e.target)) { dpState[id].open = false; dpRender(id); }
   });
 });
 
@@ -335,92 +444,126 @@ document.addEventListener('DOMContentLoaded', () => {
 async function handleUpload(e) {
   e.preventDefault();
   clearStatus('upload-status');
-
-  const file   = document.getElementById('file').files[0];
-  const title  = document.getElementById('title').value.trim();
+  const file    = document.getElementById('file').files[0];
+  const title   = document.getElementById('title').value.trim();
   const tagsRaw = document.getElementById('tags').value;
-  const date   = document.getElementById('date').value || null;
-  const btn    = document.getElementById('upload-btn');
-
-  const tags = tagsRaw
-    .split(',')
-    .map(t => t.trim().toLowerCase())
-    .filter(Boolean);
+  const date    = dpState['dp-upload']?.value || null;
+  const btn     = document.getElementById('upload-btn');
+  const tags = tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> uploading…';
 
-  // 1. Upload image to storage
-  const ext      = file.name.split('.').pop();
+  const ext = file.name.split('.').pop();
   const filename = `${Date.now()}.${ext}`;
 
-  const { error: storageErr } = await sb.storage.from('photos').upload(filename, file, {
-    cacheControl: '31536000',
-    upsert: false,
-  });
-
+  const { error: storageErr } = await sb.storage.from('photos').upload(filename, file, { cacheControl: '31536000', upsert: false });
   if (storageErr) {
     setStatus('upload-status', `storage: ${storageErr.message}`, 'error');
-    btn.disabled = false;
-    btn.textContent = 'upload to graph';
-    return;
+    btn.disabled = false; btn.textContent = 'upload to graph'; return;
   }
 
-  // 2. Get public URL
   const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(filename);
-
-  // 3. Insert row
   const { error: dbErr } = await sb.from('nodes').insert({ title, src_url: publicUrl, tags, date });
 
-  btn.disabled = false;
-  btn.textContent = 'upload to graph';
-
-  if (dbErr) {
-    setStatus('upload-status', `database: ${dbErr.message}`, 'error');
-    return;
-  }
+  btn.disabled = false; btn.textContent = 'upload to graph';
+  if (dbErr) { setStatus('upload-status', `database: ${dbErr.message}`, 'error'); return; }
 
   setStatus('upload-status', `"${title}" added to the graph.`, 'success');
   document.getElementById('upload-form').reset();
   document.getElementById('img-preview').classList.remove('visible');
+  dpCreate('dp-upload', null);
   loadPhotoList();
 }
 
 // ─── PHOTO LIST ──────────────────────────────────────────────────────────────
 async function loadPhotoList() {
+  Object.keys(dpState).forEach(id => { if (id.startsWith('dp-edit-')) delete dpState[id]; });
+
   const listEl = document.getElementById('photo-list');
   listEl.innerHTML = '<p class="list-empty">loading…</p>';
 
   const { data, error } = await sb.from('nodes').select('*').order('created_at', { ascending: false });
+  if (error || !data?.length) { listEl.innerHTML = '<p class="list-empty">no photos yet.</p>'; return; }
 
-  if (error || !data?.length) {
-    listEl.innerHTML = '<p class="list-empty">no photos yet.</p>';
-    return;
-  }
+  data.forEach(n => { photoData[n.id] = n; });
 
-  listEl.innerHTML = data.map(n => `
+  listEl.innerHTML = data.map(n => {
+    const meta = [
+      (n.tags || []).join(' · '),
+      n.date ? dpFmt(n.date) : ''
+    ].filter(Boolean).join(' · ');
+    return `
     <div class="photo-row" id="row-${n.id}">
-      <img class="photo-thumb" src="${n.src_url}" alt="${n.title}">
+      <img class="photo-thumb" src="${n.src_url}" alt="">
       <div class="photo-info">
         <div class="photo-title">${n.title}</div>
-        <div class="photo-meta">${(n.tags || []).join(' · ')}${n.date ? ' · ' + n.date : ''}</div>
+        <div class="photo-meta">${meta}</div>
       </div>
-      <button class="photo-delete" onclick="deletePhoto('${n.id}', '${n.src_url}')">delete</button>
-    </div>
-  `).join('');
+      <div class="photo-actions">
+        <button class="btn-edit" onclick="editPhoto('${n.id}')">edit</button>
+        <span class="actions-sep">·</span>
+        <button class="photo-delete" onclick="deletePhoto('${n.id}', '${n.src_url}')">delete</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
+// ─── EDIT ────────────────────────────────────────────────────────────────────
+function editPhoto(id) {
+  const photo = photoData[id];
+  if (!photo) return;
+  const row = document.getElementById(`row-${id}`);
+  if (!row) return;
+
+  const tagsStr = (photo.tags || []).join(', ');
+  const dpId = `dp-edit-${id}`;
+
+  row.querySelector('.photo-actions').innerHTML = `
+    <div class="photo-edit-actions">
+      <button class="btn-save-edit" onclick="saveEdit('${id}')">save</button>
+      <button class="btn-cancel-edit" onclick="loadPhotoList()">cancel</button>
+    </div>`;
+
+  const fields = document.createElement('div');
+  fields.className = 'photo-edit-fields';
+  fields.innerHTML = `
+    <div class="photo-edit-field">
+      <label>tags</label>
+      <input class="form-input--sm" type="text" id="edit-tags-${id}" placeholder="nyc, friends">
+    </div>
+    <div class="photo-edit-field">
+      <label>date</label>
+      <div class="dp-wrap dp-wrap--sm" id="${dpId}"></div>
+    </div>`;
+  row.querySelector('.photo-info').appendChild(fields);
+  document.getElementById(`edit-tags-${id}`).value = tagsStr;
+
+  row.classList.add('photo-row--editing');
+  dpCreate(dpId, photo.date || null);
+}
+
+async function saveEdit(id) {
+  const tagsRaw = document.getElementById(`edit-tags-${id}`)?.value || '';
+  const tags = tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+  const date = dpState[`dp-edit-${id}`]?.value || null;
+
+  const btn = document.querySelector(`#row-${id} .btn-save-edit`);
+  btn.textContent = 'saving…'; btn.disabled = true;
+
+  const { error } = await sb.from('nodes').update({ tags, date }).eq('id', id);
+  if (error) { alert(error.message); btn.textContent = 'save'; btn.disabled = false; return; }
+
+  loadPhotoList();
+}
+
+// ─── DELETE ──────────────────────────────────────────────────────────────────
 async function deletePhoto(id, srcUrl) {
   if (!confirm('Remove this photo from the graph?')) return;
-
-  // Extract filename from the URL for storage deletion
   const filename = srcUrl.split('/').pop();
-
   await sb.storage.from('photos').remove([filename]);
   const { error } = await sb.from('nodes').delete().eq('id', id);
-
   if (error) { alert(error.message); return; }
-
   const row = document.getElementById(`row-${id}`);
   if (row) row.remove();
   if (!document.querySelector('.photo-row')) {
@@ -431,11 +574,7 @@ async function deletePhoto(id, srcUrl) {
 // ─── INIT ────────────────────────────────────────────────────────────────────
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    enterUploadView(session.user);
-  } else {
-    showLogin();
-  }
+  if (session?.user) { enterUploadView(session.user); } else { showLogin(); }
 }
 
 init();
